@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宏观经济模拟推演系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
+    <link href="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.14.0/mapbox-gl.js"></script>
+
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0a3d62',
+                        secondary: '#3c6382',
+                        accent: '#60a3bc',
+                        success: '#27ae60',
+                        danger: '#e74c3c',
+                        warning: '#f39c12',
+                        neutral: '#192a56',
+                        'neutral-light': '#f5f6fa',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .panel-shadow {
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .scrollbar-thin {
+                scrollbar-width: thin;
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        }
+    </style>
+    <style>
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-gray-100 min-h-screen overflow-hidden">
+    <!-- 顶部导航栏 -->
+    <header class="bg-primary border-b border-accent/30 px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+            <i class="fa fa-line-chart text-2xl text-accent"></i>
+            <h1 class="text-[clamp(1.2rem,2vw,1.8rem)] font-bold text-white">宏观经济模拟推演系统</h1>
+        </div>
+
+        <div class="flex items-center space-x-6">
+            <!-- 状态切换 -->
+            <div class="flex items-center space-x-2 bg-neutral/50 rounded-lg p-1">
+                <button id="normal-state"
+                    class="px-4 py-2 rounded-md bg-success text-white font-medium transition-all duration-300">
+                    常态
+                </button>
+                <button id="crisis-state"
+                    class="px-4 py-2 rounded-md text-gray-200 hover:bg-warning/20 font-medium transition-all duration-300">
+                    危机态
+                </button>
+                <button id="war-state"
+                    class="px-4 py-2 rounded-md text-gray-200 hover:bg-danger/20 font-medium transition-all duration-300">
+                    战争态
+                </button>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button class="p-2 rounded-full hover:bg-accent/20 transition-all">
+                    <i class="fa fa-refresh text-gray-300"></i>
+                </button>
+                <button class="p-2 rounded-full hover:bg-accent/20 transition-all">
+                    <i class="fa fa-cog text-gray-300"></i>
+                </button>
+                <div class="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+                    <span class="text-sm font-medium">管</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="flex h-[calc(100vh-61px)] overflow-hidden">
+        <!-- 左侧面板 -->
+        <section class="w-1/4 bg-gray-800 overflow-y-auto scrollbar-thin p-4 space-y-6">
+            <!-- 经济概览 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold text-white">经济运行概览</h2>
+                    <span class="text-xs bg-success/20 text-success px-2 py-1 rounded-full">
+                        <i class="fa fa-check-circle mr-1"></i>实时更新
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <!-- GDP -->
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="text-xs text-gray-400 mb-1">GDP(季度)</div>
+                        <div class="text-xl font-bold text-white">28.4万亿元</div>
+                        <div class="text-success text-xs flex items-center mt-1">
+                            <i class="fa fa-arrow-up mr-1"></i> 4.5% 同比
+                        </div>
+                    </div>
+
+                    <!-- CPI -->
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="text-xs text-gray-400 mb-1">CPI(月度)</div>
+                        <div class="text-xl font-bold text-white">101.2</div>
+                        <div class="text-danger text-xs flex items-center mt-1">
+                            <i class="fa fa-arrow-down mr-1"></i> 0.2% 同比
+                        </div>
+                    </div>
+
+                    <!-- 失业率 -->
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="text-xs text-gray-400 mb-1">城镇调查失业率</div>
+                        <div class="text-xl font-bold text-white">5.2%</div>
+                        <div class="text-danger text-xs flex items-center mt-1">
+                            <i class="fa fa-arrow-up mr-1"></i> 0.1% 环比
+                        </div>
+                    </div>
+
+                    <!-- 外汇储备 -->
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="text-xs text-gray-400 mb-1">外汇储备</div>
+                        <div class="text-xl font-bold text-white">3.1万亿美元</div>
+                        <div class="text-success text-xs flex items-center mt-1">
+                            <i class="fa fa-arrow-up mr-1"></i> 0.3% 环比
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 主要经济指标趋势图 -->
+                <div class="h-48">
+                    <canvas id="mainIndicatorsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 经济指标分类展示 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">经济指标详情</h2>
+
+                <!-- 指标分类标签 -->
+                <div class="flex space-x-2 mb-4 overflow-x-auto scrollbar-hide pb-2">
+                    <button class="px-3 py-1 bg-accent text-white text-sm rounded-full whitespace-nowrap">全部指标</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">金融</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">工业生产</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">消费</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">就业</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">进出口</button>
+                </div>
+
+                <!-- 指标列表 -->
+                <div class="space-y-3 max-h-96 overflow-y-auto scrollbar-thin pr-2">
+                    <!-- 指标项 -->
+                    <div
+                        class="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-accent/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-medium text-white">工业增加值</div>
+                                <div class="text-xs text-gray-400">2023年6月</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-white">4.6%</div>
+                                <div class="text-success text-xs flex items-center justify-end mt-1">
+                                    <i class="fa fa-arrow-up mr-1"></i> 0.4% 环比
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-8 bg-gray-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-accent to-success" style="width: 65%"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-accent/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-medium text-white">社会消费品零售总额</div>
+                                <div class="text-xs text-gray-400">2023年6月</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-white">3.8万亿元</div>
+                                <div class="text-success text-xs flex items-center justify-end mt-1">
+                                    <i class="fa fa-arrow-up mr-1"></i> 3.1% 同比
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-8 bg-gray-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-accent to-success" style="width: 58%"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-accent/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-medium text-white">出口额</div>
+                                <div class="text-xs text-gray-400">2023年6月</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-white">2.8万亿元</div>
+                                <div class="text-danger text-xs flex items-center justify-end mt-1">
+                                    <i class="fa fa-arrow-down mr-1"></i> 12.4% 同比
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-8 bg-gray-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-accent to-danger" style="width: 42%"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-accent/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-medium text-white">M2货币供应量</div>
+                                <div class="text-xs text-gray-400">2023年6月</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-white">11.3%</div>
+                                <div class="text-success text-xs flex items-center justify-end mt-1">
+                                    <i class="fa fa-arrow-up mr-1"></i> 0.1% 环比
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-8 bg-gray-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-accent to-success" style="width: 72%"></div>
+                        </div>
+                    </div>
+
+                    <div
+                        class="bg-gray-800 rounded-lg p-3 border border-gray-700 hover:border-accent/50 transition-all">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="text-sm font-medium text-white">财政收入</div>
+                                <div class="text-xs text-gray-400">2023年上半年累计</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-lg font-bold text-white">11.9万亿元</div>
+                                <div class="text-danger text-xs flex items-center justify-end mt-1">
+                                    <i class="fa fa-arrow-down mr-1"></i> 10.2% 同比
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-2 h-8 bg-gray-900 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-accent to-danger" style="width: 45%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 经济威胁清单 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">经济威胁清单</h2>
+
+                <div class="space-y-3 max-h-64 overflow-y-auto scrollbar-thin pr-2">
+                    <div class="bg-gray-800/50 rounded-lg p-3 border-l-4 border-danger">
+                        <div class="flex justify-between items-start">
+                            <div class="text-sm font-medium text-white">台海局势紧张引发的贸易制裁风险</div>
+                            <span class="text-xs bg-danger/20 text-danger px-2 py-0.5 rounded-full">高风险</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">可能导致美国及其盟友对我国高科技产业实施更严格的出口管制，影响半导体供应链。</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-3 border-l-4 border-warning">
+                        <div class="flex justify-between items-start">
+                            <div class="text-sm font-medium text-white">全球能源价格波动</div>
+                            <span class="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full">中风险</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">地缘政治冲突持续导致国际能源价格不稳定，可能增加国内制造业成本。</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-3 border-l-4 border-warning">
+                        <div class="flex justify-between items-start">
+                            <div class="text-sm font-medium text-white">区域供应链重构</div>
+                            <span class="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full">中风险</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">部分国家推动供应链"去中国化"，可能影响我国出口导向型产业。</p>
+                    </div>
+
+                    <div class="bg-gray-800/50 rounded-lg p-3 border-l-4 border-gray-500">
+                        <div class="flex justify-between items-start">
+                            <div class="text-sm font-medium text-white">跨境资本流动波动</div>
+                            <span class="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded-full">低风险</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">全球货币政策调整可能导致跨境资本流动加剧，影响外汇市场稳定。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 中间地图区域 -->
+        <section class="w-2/4 bg-gray-800 relative overflow-hidden">
+            <!-- 地图容器 -->
+            <div class="absolute inset-0 bg-green-900/30">
+                静态地图背景
+                <!-- <img src="https://picsum.photos/id/1015/1200/800" alt="世界地图" class="w-full h-full object-cover opacity-40"> -->
+
+                <!-- 地图上的标记点 -->
+                <!-- <div class="absolute top-[30%] left-[25%] group">
+                    <div class="w-4 h-4 bg-blue-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">美国</div>
+                </div>
+                
+                <div class="absolute top-[20%] left-[70%] group">
+                    <div class="w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">中国</div>
+                </div>
+                
+                <div class="absolute top-[25%] left-[75%] group">
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">台湾地区</div>
+                </div>
+                
+                <div class="absolute top-[15%] left-[55%] group">
+                    <div class="w-3 h-3 bg-green-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">俄罗斯</div>
+                </div>
+                
+                <div class="absolute top-[35%] left-[78%] group">
+                    <div class="w-3 h-3 bg-purple-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">东盟</div>
+                </div>
+                
+                <div class="absolute top-[20%] left-[40%] group">
+                    <div class="w-3 h-3 bg-orange-500 rounded-full border-2 border-white animate-pulse-slow"></div>
+                    <div class="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-gray-900 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">欧盟</div>
+                </div> -->
+
+                <!-- 连接线 -->
+                <!-- <svg class="absolute inset-0 w-full h-full" style="pointer-events: none;">
+                    <line x1="25%" y1="30%" x2="75%" y2="25%" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="5,5" />
+                    <line x1="70%" y1="20%" x2="75%" y2="25%" stroke="rgba(255,255,255,0.4)" stroke-width="1.5" />
+                    <line x1="25%" y1="30%" x2="40%" y2="20%" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                    <line x1="70%" y1="20%" x2="55%" y2="15%" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                    <line x1="70%" y1="20%" x2="78%" y2="35%" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                </svg> -->
+
+                <div id="map"></div>
+                <script>
+                    // TO MAKE THE MAP APPEAR YOU MUST
+                    // ADD YOUR ACCESS TOKEN FROM
+                    // https://account.mapbox.com
+                    mapboxgl.accessToken = 'pk.eyJ1IjoiZ29kd2l0IiwiYSI6ImNtZXdvd3VncTByZzAya3EyYnFremZtZmQifQ.SLSZ5a4ExscQl4b_Tmq-6g';
+                    const map = new mapboxgl.Map({
+                        container: 'map', // container ID
+                        center: [119.948195,24.525070], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+                        zoom: 5 // starting zoom
+                    });
+                </script>
+            </div>
+
+            <!-- 态势信息面板 -->
+            <div
+                class="absolute bottom-6 left-6 right-6 bg-gray-900/80 backdrop-blur-sm rounded-xl p-4 border border-gray-700">
+                <div class="flex justify-between items-center mb-3">
+                    <h2 class="text-white font-semibold">宏观经济态势评估</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-400">当前时间:</span>
+                        <span class="text-xs text-white">2023年7月</span>
+                    </div>
+                </div>
+
+                <!-- 态势指标 -->
+                <div class="grid grid-cols-4 gap-3 mb-3">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">经济稳定性</div>
+                        <div class="text-lg font-bold text-success">78分</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">产业韧性</div>
+                        <div class="text-lg font-bold text-success">82分</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">金融安全</div>
+                        <div class="text-lg font-bold text-warning">65分</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-400">社会稳定</div>
+                        <div class="text-lg font-bold text-success">85分</div>
+                    </div>
+                </div>
+
+                <!-- 时间轴 -->
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-gray-400">时间推演: 2023年7月 - 2024年12月</span>
+                        <div class="flex space-x-2">
+                            <button class="p-1 bg-gray-800 rounded hover:bg-gray-700 transition-all">
+                                <i class="fa fa-step-backward text-xs text-gray-300"></i>
+                            </button>
+                            <button class="p-1 bg-gray-800 rounded hover:bg-gray-700 transition-all">
+                                <i class="fa fa-play text-xs text-gray-300"></i>
+                            </button>
+                            <button class="p-1 bg-gray-800 rounded hover:bg-gray-700 transition-all">
+                                <i class="fa fa-step-forward text-xs text-gray-300"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative h-2 bg-gray-800 rounded-full">
+                        <div class="absolute h-full bg-accent rounded-full" style="width: 25%; left: 0"></div>
+                        <div class="absolute w-4 h-4 bg-white rounded-full -mt-1 border-2 border-accent cursor-pointer"
+                            style="left: 25%"></div>
+
+                        <!-- 时间标记 -->
+                        <div class="absolute flex justify-between w-full mt-2">
+                            <span class="text-xs text-gray-400">2023/7</span>
+                            <span class="text-xs text-gray-400">2023/10</span>
+                            <span class="text-xs text-gray-400">2024/1</span>
+                            <span class="text-xs text-gray-400">2024/4</span>
+                            <span class="text-xs text-gray-400">2024/7</span>
+                            <span class="text-xs text-gray-400">2024/10</span>
+                            <span class="text-xs text-gray-400">2024/12</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧悬浮控制面板 -->
+            <div class="absolute top-4 right-4 flex flex-col space-y-2">
+                <button
+                    class="w-10 h-10 bg-gray-900/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-gray-700 hover:bg-gray-800 transition-all">
+                    <i class="fa fa-search-plus text-gray-300"></i>
+                </button>
+                <button
+                    class="w-10 h-10 bg-gray-900/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-gray-700 hover:bg-gray-800 transition-all">
+                    <i class="fa fa-search-minus text-gray-300"></i>
+                </button>
+                <button
+                    class="w-10 h-10 bg-gray-900/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-gray-700 hover:bg-gray-800 transition-all">
+                    <i class="fa fa-expand text-gray-300"></i>
+                </button>
+                <button
+                    class="w-10 h-10 bg-gray-900/80 backdrop-blur-sm rounded-full flex items-center justify-center border border-gray-700 hover:bg-gray-800 transition-all">
+                    <i class="fa fa-map-marker text-gray-300"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- 右侧面板 -->
+        <section class="w-1/4 bg-gray-800 overflow-y-auto scrollbar-thin p-4 space-y-6">
+            <!-- 各方决策链 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">各方决策链与政策效果</h2>
+
+                <!-- 决策方选择 -->
+                <div class="flex space-x-2 mb-4 overflow-x-auto scrollbar-hide pb-2">
+                    <button class="px-3 py-1 bg-accent text-white text-sm rounded-full whitespace-nowrap">全部</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">美国</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">台湾地区</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">欧盟</button>
+                    <button
+                        class="px-3 py-1 bg-gray-800 text-gray-300 text-sm rounded-full hover:bg-gray-700 whitespace-nowrap transition-all">我方</button>
+                </div>
+
+                <!-- 决策链可视化 -->
+                <div class="space-y-4 max-h-80 overflow-y-auto scrollbar-thin pr-2">
+                    <!-- 美国决策链 -->
+                    <div class="relative pl-6 pb-4 border-l-2 border-blue-500">
+                        <div class="absolute left-[-7px] w-3 h-3 rounded-full bg-blue-500"></div>
+                        <div class="text-sm font-medium text-blue-400">美国</div>
+                        <div class="mt-1 bg-gray-800 rounded-lg p-2 text-xs text-gray-300">
+                            <div class="font-medium text-white mb-1">对台军售计划</div>
+                            <p>计划向台湾地区出售约10亿美元的武器装备，包括导弹系统和战斗机零部件。</p>
+                            <div class="mt-2 flex items-center text-xs">
+                                <span class="bg-warning/20 text-warning px-2 py-0.5 rounded mr-2">经济影响度: 中等</span>
+                                <span class="text-gray-400">预计时间: 2023年Q4</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 台湾地区决策链 -->
+                    <div class="relative pl-6 pb-4 border-l-2 border-yellow-500">
+                        <div class="absolute left-[-7px] w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="text-sm font-medium text-yellow-400">台湾地区</div>
+                        <div class="mt-1 bg-gray-800 rounded-lg p-2 text-xs text-gray-300">
+                            <div class="font-medium text-white mb-1">扩大"新南向政策"</div>
+                            <p>计划增加对东南亚国家的投资和贸易，减少对大陆市场的依赖。</p>
+                            <div class="mt-2 flex items-center text-xs">
+                                <span class="bg-warning/20 text-warning px-2 py-0.5 rounded mr-2">经济影响度: 低等</span>
+                                <span class="text-gray-400">预计时间: 2023年Q3</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 欧盟决策链 -->
+                    <div class="relative pl-6 pb-4 border-l-2 border-orange-500">
+                        <div class="absolute left-[-7px] w-3 h-3 rounded-full bg-orange-500"></div>
+                        <div class="text-sm font-medium text-orange-400">欧盟</div>
+                        <div class="mt-1 bg-gray-800 rounded-lg p-2 text-xs text-gray-300">
+                            <div class="font-medium text-white mb-1">半导体出口管制评估</div>
+                            <p>正在评估对中国半导体产业实施更严格的出口管制措施，可能跟随美国政策。</p>
+                            <div class="mt-2 flex items-center text-xs">
+                                <span class="bg-danger/20 text-danger px-2 py-0.5 rounded mr-2">经济影响度: 高等</span>
+                                <span class="text-gray-400">预计时间: 2023年Q4</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 我方决策链 -->
+                    <div class="relative pl-6 border-l-2 border-red-500">
+                        <div class="absolute left-[-7px] w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="text-sm font-medium text-red-400">我方</div>
+                        <div class="mt-1 bg-gray-800 rounded-lg p-2 text-xs text-gray-300">
+                            <div class="font-medium text-white mb-1">反制贸易措施</div>
+                            <p>计划对参与对台军售的美国企业实施制裁，限制其在华业务。</p>
+                            <div class="mt-2 flex items-center text-xs">
+                                <span class="bg-success/20 text-success px-2 py-0.5 rounded mr-2">效果评估: 有效</span>
+                                <span class="text-gray-400">实施时间: 立即</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 宏观经济政策和效果 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">宏观经济政策和效果</h2>
+
+                <div class="space-y-3 max-h-64 overflow-y-auto scrollbar-thin pr-2">
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="flex justify-between">
+                            <div class="text-sm font-medium text-white">加大基础设施投资</div>
+                            <span class="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">已实施</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">计划新增1.2万亿元基础设施投资，重点投向新基建和民生工程。</p>
+                        <div class="mt-2 flex items-center justify-between">
+                            <div class="text-xs text-gray-400">预计GDP拉动: <span class="text-success">0.8-1.2个百分点</span>
+                            </div>
+                            <div class="text-xs text-gray-400">就业影响: <span class="text-success">+200万人</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="flex justify-between">
+                            <div class="text-sm font-medium text-white">科技创新扶持政策</div>
+                            <span class="text-xs bg-warning/20 text-warning px-2 py-0.5 rounded-full">计划中</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">设立5000亿元科技创新基金，重点支持半导体、人工智能等关键领域。</p>
+                        <div class="mt-2 flex items-center justify-between">
+                            <div class="text-xs text-gray-400">产业升级效果: <span class="text-warning">中长期</span></div>
+                            <div class="text-xs text-gray-400">国际竞争力: <span class="text-success">提升显著</span></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 rounded-lg p-3 border border-gray-700">
+                        <div class="flex justify-between">
+                            <div class="text-sm font-medium text-white">稳外贸支持措施</div>
+                            <span class="text-xs bg-success/20 text-success px-2 py-0.5 rounded-full">已实施</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">扩大出口信用保险覆盖面，设立2000亿元外贸发展基金。</p>
+                        <div class="mt-2 flex items-center justify-between">
+                            <div class="text-xs text-gray-400">出口影响: <span class="text-success">+3.5%</span></div>
+                            <div class="text-xs text-gray-400">企业受益: <span class="text-success">约8万家</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 重点产业链受影响情况 -->
+            <div class="bg-gray-900 rounded-xl panel-shadow p-4">
+                <h2 class="text-lg font-semibold text-white mb-4">重点产业链受影响情况</h2>
+
+                <!-- 产业链影响图表 -->
+                <div class="h-48 mb-4">
+                    <canvas id="industryChainChart"></canvas>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-300">半导体产业链</span>
+                        <div class="flex items-center">
+                            <span class="text-danger mr-2">高风险</span>
+                            <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-danger" style="width: 85%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-300">船舶制造产业链</span>
+                        <div class="flex items-center">
+                            <span class="text-warning mr-2">中风险</span>
+                            <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-warning" style="width: 55%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-300">人工智能产业链</span>
+                        <div class="flex items-center">
+                            <span class="text-warning mr-2">中风险</span>
+                            <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-warning" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-300">无人机产业链</span>
+                        <div class="flex items-center">
+                            <span class="text-success mr-2">低风险</span>
+                            <div class="w-24 h-2 bg-gray-700 rounded-full overflow-hidden">
+                                <div class="h-full bg-success" style="width: 30%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 初始化主要经济指标趋势图
+        const mainIndicatorsCtx = document.getElementById('mainIndicatorsChart').getContext('2d');
+        const mainIndicatorsChart = new Chart(mainIndicatorsCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [
+                    {
+                        label: 'GDP增长率(%)',
+                        data: [4.0, 4.2, 4.3, 4.4, 4.4, 4.5],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    },
+                    {
+                        label: 'CPI(%)',
+                        data: [2.1, 1.8, 1.5, 1.0, 0.5, 0.2],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        tension: 0.3,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#f5f6fa',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.05)'
+                        },
+                        ticks: {
+                            color: '#aaa'
+                        }
+                    }
+                }
+            }
+        });
+
+        // 初始化产业链影响图表
+        const industryChainCtx = document.getElementById('industryChainChart').getContext('2d');
+        const industryChainChart = new Chart(industryChainCtx, {
+            type: 'radar',
+            data: {
+                labels: ['技术依赖度', '出口依存度', '供应链风险', '替代能力', '政策支持度'],
+                datasets: [
+                    {
+                        label: '半导体',
+                        data: [85, 70, 80, 40, 90],
+                        backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                        borderColor: 'rgba(231, 76, 60, 1)',
+                        pointBackgroundColor: 'rgba(231, 76, 60, 1)'
+                    },
+                    {
+                        label: '人工智能',
+                        data: [60, 50, 55, 65, 85],
+                        backgroundColor: 'rgba(243, 156, 18, 0.2)',
+                        borderColor: 'rgba(243, 156, 18, 1)',
+                        pointBackgroundColor: 'rgba(243, 156, 18, 1)'
+                    },
+                    {
+                        label: '无人机',
+                        data: [40, 65, 30, 80, 75],
+                        backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                        borderColor: 'rgba(39, 174, 96, 1)',
+                        pointBackgroundColor: 'rgba(39, 174, 96, 1)'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            color: '#f5f6fa',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        },
+                        pointLabels: {
+                            color: '#aaa',
+                            font: {
+                                size: 9
+                            }
+                        },
+                        ticks: {
+                            color: 'rgba(255, 255, 255, 0.5)',
+                            backdropColor: 'transparent',
+                            font: {
+                                size: 8
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 状态切换功能
+        document.getElementById('normal-state').addEventListener('click', function () {
+            setActiveState(this);
+            // 这里可以添加切换到常态的逻辑
+        });
+
+        document.getElementById('crisis-state').addEventListener('click', function () {
+            setActiveState(this);
+            // 这里可以添加切换到危机态的逻辑
+        });
+
+        document.getElementById('war-state').addEventListener('click', function () {
+            setActiveState(this);
+            // 这里可以添加切换到战争态的逻辑
+        });
+
+        function setActiveState(element) {
+            // 移除所有按钮的活跃状态
+            document.querySelectorAll('#normal-state, #crisis-state, #war-state').forEach(btn => {
+                btn.classList.remove('bg-success', 'bg-warning', 'bg-danger', 'text-white');
+                btn.classList.add('text-gray-200', 'hover:bg-warning/20');
+            });
+
+            // 设置当前按钮的活跃状态
+            if (element.id === 'normal-state') {
+                element.classList.add('bg-success', 'text-white');
+            } else if (element.id === 'crisis-state') {
+                element.classList.add('bg-warning', 'text-white');
+            } else {
+                element.classList.add('bg-danger', 'text-white');
+            }
+            element.classList.remove('text-gray-200', 'hover:bg-warning/20');
+        }
+    </script>
+</body>
+
+</html>
