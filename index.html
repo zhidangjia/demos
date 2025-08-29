@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宏观经济模拟推演系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Beige, Slate, Soft Amber) -->
+    <!-- Application Structure Plan: 采用经典的仪表盘（Dashboard）布局。顶部是全局状态控制器（常态/危机/战争）和核心指标概览。中部主体分为三栏：左栏展示“威胁清单”与“我方政策应对”；中栏是核心的“态势地图”与“时间轴推演控制器”；右栏展示“各方决策链”与“重点产业链影响”。底部是一个详细的经济指标矩阵。这种结构将宏观态势、具体威胁、我方应对策略及详细数据清晰分离，用户可以通过“状态切换”和“时间轴”两个核心交互点来驱动整个仪表盘的数据变化，符合从宏观到微观的分析习惯，实现了高效的信息导航和探索。 -->
+    <!-- Visualization & Content Choices: 1. 经济指标 -> 目标:通知/对比 -> 方式:带趋势线的指标卡片 -> 交互:无 -> 理由:直观展示数值和短期趋势 -> 库:Chart.js Canvas。 2. 政策效果 -> 目标:对比/关系 -> 方式:环形图+条形图 -> 交互:状态/时间切换时更新 -> 理由:清晰展示政策组合及对关键指标的影响 -> 库:Chart.js Canvas。 3. 产业链影响 -> 目标:对比 -> 方式:水平条形图 -> 交互:状态/时间切换时更新 -> 理由:直观比较各产业受冲击程度 -> 库:Chart.js Canvas。 4. 决策链 -> 目标:组织/流程 -> 方式:HTML/CSS结构化模块 -> 交互:动态文本更新 -> 理由:轻量级实现流程展示，避免重度库 -> 库:无。 5. 态势地图 -> 目标:组织/提供上下文 -> 方式:HTML/CSS静态示意图 -> 交互:无 -> 理由:提供地理背景，而非复杂GIS功能 -> 库:无。 -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f5f5f4; /* Warm Neutral: Stone 100 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 800px;
+        }
+        .metric-card-chart-container {
+            position: relative;
+            width: 100%;
+            height: 40px;
+        }
+        .main-chart-container {
+            height: 220px;
+        }
+        @media (min-width: 768px) {
+            .main-chart-container {
+                height: 250px;
+            }
+        }
+        .btn-active {
+            background-color: #a855f7; /* Purple 500 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .map-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #f59e0b; /* Amber 500 */
+            border: 2px solid white;
+            box-shadow: 0 0 8px rgba(0,0,0,0.5);
+        }
+        /* Modal Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="container mx-auto p-4 lg:p-6">
+        
+        <header class="mb-6">
+            <h1 class="text-3xl font-bold text-slate-800">宏观经济模拟推演系统</h1>
+            <p class="text-slate-500 mt-1">根据不同态势和时间推演，分析地区危机对国民经济的潜在影响。</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div>
+                <span class="font-semibold mr-4">推演状态:</span>
+                <div id="status-buttons" class="inline-flex rounded-lg shadow-sm" role="group">
+                    <button type="button" data-status="normal" class="px-4 py-2 text-sm font-medium text-slate-900 bg-white border border-slate-200 rounded-l-lg hover:bg-slate-100 focus:z-10 focus:ring-2 focus:ring-purple-500">
+                        常态
+                    </button>
+                    <button type="button" data-status="crisis" class="px-4 py-2 text-sm font-medium text-slate-900 bg-white border-t border-b border-slate-200 hover:bg-slate-100 focus:z-10 focus:ring-2 focus:ring-purple-500">
+                        危机态
+                    </button>
+                    <button type="button" data-status="war" class="px-4 py-2 text-sm font-medium text-slate-900 bg-white border border-slate-200 rounded-r-lg hover:bg-slate-100 focus:z-10 focus:ring-2 focus:ring-purple-500">
+                        战争态
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4 text-center">
+                <div>
+                    <div class="text-xs text-slate-500">GDP增长率</div>
+                    <div id="overview-gdp" class="text-lg font-bold text-green-600">--%</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500">CPI</div>
+                    <div id="overview-cpi" class="text-lg font-bold text-red-600">--%</div>
+                </div>
+                <div>
+                    <div class="text-xs text-slate-500">失业率</div>
+                    <div id="overview-unemployment" class="text-lg font-bold text-amber-600">--%</div>
+                </div>
+            </div>
+        </div>
+
+        <main class="grid grid-cols-1 lg:grid-cols-3 lg:grid-rows-2 gap-6">
+            
+            <div class="lg:col-span-2 lg:row-span-2 bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-1 text-slate-800">态势地图与时间轴推演</h2>
+                <p class="text-sm text-slate-500 mb-4">拖动时间轴以观察各宏观指标在模拟过程中的动态演变。</p>
+                
+                <div class="w-full bg-slate-200 rounded-lg h-64 md:h-96 mb-6 relative overflow-hidden">
+                    <img src="https://placehold.co/1000x600/e2e8f0/64748b?text=Region+Map" alt="区域态势地图" class="w-full h-full object-cover">
+                    <div id="map-beijing" class="map-marker" style="top: 40%; left: 70%;"></div>
+                    <div id="map-taiwan" class="map-marker" style="top: 65%; left: 78%;"></div>
+                    <div id="map-usa" class="map-marker" style="top: 35%; left: 15%;"></div>
+                    <div id="map-eu" class="map-marker" style="top: 25%; left: 45%;"></div>
+                    <div id="map-asean" class="map-marker" style="top: 80%; left: 65%;"></div>
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <span id="timeline-label" class="text-sm font-medium text-slate-600 w-20">T + 0</span>
+                    <input id="timeline-slider" type="range" min="0" max="12" value="0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 text-slate-800">经济威胁清单</h2>
+                <ul id="threat-list" class="space-y-3 text-sm">
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h2 class="text-xl font-semibold mb-4 text-slate-800">重点产业链影响</h2>
+                <div class="chart-container main-chart-container">
+                    <canvas id="industry-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h2 class="text-xl font-semibold mb-4 text-slate-800">我方宏观政策模拟</h2>
+                     <div class="chart-container h-48 mb-4">
+                        <canvas id="policy-mix-chart"></canvas>
+                    </div>
+                    <div class="chart-container h-40">
+                        <canvas id="policy-effect-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm p-6 lg:col-span-2">
+                    <h2 class="text-xl font-semibold mb-4 text-slate-800">有关各方决策链</h2>
+                    <div id="decision-chain" class="space-y-4 text-sm">
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <section class="mt-6">
+            <h2 class="text-2xl font-bold mb-4 text-slate-800">核心经济指标</h2>
+            <div id="metrics-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Analysis Modal -->
+    <div id="analysis-modal" class="modal-overlay hidden">
+        <div class="modal-content w-11/12 md:w-3/4 lg:w-1/2">
+            <h3 id="analysis-modal-title" class="text-xl font-semibold mb-4 text-slate-800"></h3>
+            <div id="analysis-modal-content" class="text-slate-700 leading-relaxed">
+                <!-- LLM generated content will be placed here -->
+            </div>
+            <button class="modal-close-btn" onclick="hideModal()">&times;</button>
+        </div>
+    </div>
+
+<script>
+    const currentStateTextMap = {
+        normal: '常态',
+        crisis: '危机态',
+        war: '战争态'
+    };
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    let currentState = 'normal';
+    let currentTimeStep = 0;
+    const MAX_TIME_STEP = 12;
+
+    const SIMULATION_DATA = {
+        normal: Array.from({ length: MAX_TIME_STEP + 1 }).map((_, t) => ({
+            overview: { gdp: 5.2 + t * 0.01, cpi: 0.3 + t * 0.02, unemployment: 5.0 - t * 0.01 },
+            threats: [
+                { name: '全球经济增长放缓', level: 'low' },
+                { name: '贸易保护主义抬头', level: 'medium' },
+            ],
+            industryImpact: { '人工智能': 10 + t, '无人机': 8 + t, '船舶制造': 5 + t * 0.5 },
+            policy: { mix: { fiscal: 40, monetary: 60 }, effect: { gdp: 0.5, employment: 0.2 } },
+            decisionChain: [
+                { party: '美国', action: '维持现有贸易政策' },
+                { party: '欧盟', action: '深化数字经济合作' },
+                { party: '我方', action: '推进高水平对外开放' }
+            ],
+            metrics: {
+                GDP: 126 + t * 0.5, PPI: -2.5 + t * 0.1, CPI: 0.3 + t * 0.02, PMI: 50.2 + t * 0.05,
+                工业增加值: 5.8 + t * 0.02, 城镇调查失业率: 5.0 - t * 0.01, M2: 9.5 + t * 0.05,
+                LPR: 3.45, 企业景气指数: 110 + t, 财政收入: 21 + t * 0.1, 社会消费品零售总额: 47 + t * 0.2,
+                出口额: 3.3 + t * 0.02, 进口额: 2.8 + t * 0.01, 上证指数: 3000 + t * 10, 外汇储备: 32000 + t * 10,
+                新增信贷: 20 + t * 0.1, 房价指数: 0.5 + t * 0.01
+            }
+        })),
+        crisis: Array.from({ length: MAX_TIME_STEP + 1 }).map((_, t) => ({
+            overview: { gdp: 3.5 - t * 0.2, cpi: 1.5 + t * 0.1, unemployment: 5.5 + t * 0.1 },
+            threats: [
+                { name: '地区紧张局势升级', level: 'high' },
+                { name: '部分供应链中断风险', level: 'high' },
+                { name: '金融市场剧烈波动', level: 'medium' },
+                { name: '能源价格上涨', level: 'medium' },
+            ],
+            industryImpact: { '人工智能': 2 - t * 0.5, '无人机': -15 - t, '船舶制造': 20 + t * 2 },
+            policy: { mix: { fiscal: 65, monetary: 35 }, effect: { gdp: 1.2, employment: 0.8 } },
+            decisionChain: [
+                { party: '美国', action: '宣布对特定领域实施制裁' },
+                { party: '欧盟', action: '呼吁各方保持克制，评估经济影响' },
+                { party: '东盟', action: '维持航运通道安全' },
+                { party: '我方', action: '启动经济内循环，实施反制措施' }
+            ],
+            metrics: {
+                GDP: 120 - t * 2, PPI: 1.5 + t * 0.2, CPI: 1.5 + t * 0.1, PMI: 48.5 - t * 0.2,
+                工业增加值: 2.1 - t * 0.1, 城镇调查失业率: 5.5 + t * 0.1, M2: 12.5 + t * 0.1,
+                LPR: 3.25 - t * 0.02, 企业景气指数: 95 - t * 2, 财政收入: 19 - t * 0.2, 社会消费品零售总额: 45 - t * 0.5,
+                出口额: 2.8 - t * 0.1, 进口额: 2.5 - t * 0.05, 上证指数: 2800 - t * 20, 外汇储备: 31000 - t * 50,
+                新增信贷: 25 + t * 0.2, 房价指数: -0.5 - t * 0.02
+            }
+        })),
+        war: Array.from({ length: MAX_TIME_STEP + 1 }).map((_, t) => ({
+            overview: { gdp: -2.0 - t * 0.5, cpi: 5.0 + t * 0.5, unemployment: 8.0 + t * 0.3 },
+            threats: [
+                { name: '全面经济封锁', level: 'high' },
+                { name: '国际金融体系隔绝', level: 'high' },
+                { name: '核心供应链完全中断', level: 'high' },
+                { name: '社会稳定面临挑战', level: 'high' },
+            ],
+            industryImpact: { '人工智能': -20 - t * 2, '无人机': 50 + t * 5, '船舶制造': 80 + t * 10 },
+            policy: { mix: { fiscal: 80, monetary: 20 }, effect: { gdp: 2.5, employment: 1.5 } },
+            decisionChain: [
+                { party: '美国', action: '实施全面经济与金融封锁' },
+                { party: '俄罗斯', action: '提供能源与部分物资支持' },
+                { party: '我方', action: '转入战时经济体制，全力保障内需' }
+            ],
+            metrics: {
+                GDP: 100 - t * 5, PPI: 8.0 + t * 0.5, CPI: 5.0 + t * 0.5, PMI: 40 - t * 1,
+                工业增加值: -5.0 - t * 1, 城镇调查失业率: 8.0 + t * 0.3, M2: 18.0 + t * 0.5,
+                LPR: 2.5, 企业景气指数: 60 - t * 3, 财政收入: 15 - t * 0.5, 社会消费品零售总额: 35 - t * 1,
+                出口额: 1.0 - t * 0.1, 进口额: 0.8 - t * 0.05, 上证指数: 2200 - t * 50, 外汇储备: 25000 - t * 200,
+                新增信贷: 35 + t * 1, 房价指数: -5.0 - t * 0.5
+            }
+        }))
+    };
+
+    const charts = {};
+
+    function createChart(ctx, type, data, options) {
+        return new Chart(ctx, { type, data, options });
+    }
+    
+    const defaultChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                enabled: true,
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                titleFont: { size: 12 },
+                bodyFont: { size: 12 },
+            }
+        },
+        scales: {
+            x: { display: false },
+            y: { display: false }
+        }
+    };
+
+    function initCharts() {
+        const metricKeys = Object.keys(SIMULATION_DATA.normal[0].metrics);
+        const metricsGrid = document.getElementById('metrics-grid');
+        metricsGrid.innerHTML = '';
+        metricKeys.forEach(key => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-sm p-4';
+            card.innerHTML = `
+                <div class="flex justify-between items-center mb-1">
+                    <h3 class="text-sm font-medium text-slate-600">${key}</h3>
+                    <span id="metric-status-${key}" class="text-xs font-semibold px-2 py-0.5 rounded-full"></span>
+                </div>
+                <p id="metric-value-${key}" class="text-2xl font-bold mb-2">--</p>
+                <div class="metric-card-chart-container">
+                    <canvas id="metric-chart-${key}"></canvas>
+                </div>
+            `;
+            metricsGrid.appendChild(card);
+            const ctx = document.getElementById(`metric-chart-${key}`).getContext('2d');
+            charts[`metric-${key}`] = createChart(ctx, 'line', {
+                labels: Array.from({length: 7}).map((_, i) => i),
+                datasets: [{
+                    data: [],
+                    borderColor: '#a855f7',
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    tension: 0.4
+                }]
+            }, defaultChartOptions);
+        });
+
+        const industryCtx = document.getElementById('industry-chart').getContext('2d');
+        charts.industry = new Chart(industryCtx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: '影响指数',
+                    data: [],
+                    backgroundColor: [],
+                    borderColor: [],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: '#e2e8f0' } },
+                    y: { grid: { display: false } }
+                }
+            }
+        });
+
+        const policyMixCtx = document.getElementById('policy-mix-chart').getContext('2d');
+        charts.policyMix = new Chart(policyMixCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['财政政策', '货币政策'],
+                datasets: [{
+                    data: [],
+                    backgroundColor: ['#60a5fa', '#f87171'],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 12 } } } }
+            }
+        });
+
+        const policyEffectCtx = document.getElementById('policy-effect-chart').getContext('2d');
+        charts.policyEffect = new Chart(policyEffectCtx, {
+            type: 'bar',
+            data: {
+                labels: ['对GDP贡献(%)', '对就业贡献(%)'],
+                datasets: [{
+                    data: [],
+                    backgroundColor: ['#34d399', '#fbbf24'],
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#e2e8f0' } }
+                }
+            }
+        });
+    }
+
+    function updateDashboard() {
+        const data = SIMULATION_DATA[currentState][currentTimeStep];
+
+        document.getElementById('overview-gdp').textContent = `${data.overview.gdp.toFixed(1)}%`;
+        document.getElementById('overview-cpi').textContent = `${data.overview.cpi.toFixed(1)}%`;
+        document.getElementById('overview-unemployment').textContent = `${data.overview.unemployment.toFixed(1)}%`;
+        
+        const gdpChange = data.overview.gdp - SIMULATION_DATA.normal[0].overview.gdp;
+        document.getElementById('overview-gdp').className = `text-lg font-bold ${gdpChange >= 0 ? 'text-green-600' : 'text-red-600'}`;
+        const cpiChange = data.overview.cpi - SIMULATION_DATA.normal[0].overview.cpi;
+        document.getElementById('overview-cpi').className = `text-lg font-bold ${cpiChange > 1 ? 'text-red-600' : 'text-amber-600'}`;
+        const unemployChange = data.overview.unemployment - SIMULATION_DATA.normal[0].overview.unemployment;
+        document.getElementById('overview-unemployment').className = `text-lg font-bold ${unemployChange > 0 ? 'text-red-600' : 'text-amber-600'}`;
+
+        const threatList = document.getElementById('threat-list');
+        const currentStateDisplay = currentStateTextMap[currentState];
+        const currentOverview = data.overview;
+
+        threatList.innerHTML = data.threats.map(threat => {
+            const levelColor = { high: 'bg-red-500', medium: 'bg-amber-500', low: 'bg-green-500' };
+            return `
+                <li class="flex items-center justify-between py-1">
+                    <span class="flex-grow">${threat.name}</span>
+                    <div class="flex items-center space-x-2">
+                        <span class="flex items-center text-xs font-semibold">
+                            <span class="w-3 h-3 rounded-full ${levelColor[threat.level]} mr-2"></span>
+                            ${{high: '高', medium: '中', low: '低'}[threat.level]}
+                        </span>
+                        <button type="button" class="px-2 py-1 text-xs font-medium text-white bg-purple-500 rounded hover:bg-purple-600 transition-colors"
+                                onclick="showThreatAnalysis('${threat.name}', '${currentStateDisplay}', ${currentTimeStep}, ${currentOverview.gdp}, ${currentOverview.cpi}, ${currentOverview.unemployment})">
+                            ✨分析
+                        </button>
+                    </div>
+                </li>`;
+        }).join('');
+
+        const decisionChain = document.getElementById('decision-chain');
+        decisionChain.innerHTML = data.decisionChain.map((item, index) => `
+            <div class="flex items-start">
+                <div class="flex-shrink-0 w-24 text-right pr-4">
+                    <span class="font-semibold text-purple-600">${item.party}</span>
+                </div>
+                <div class="relative flex-shrink-0 w-8 text-center">
+                    <div class="h-full w-0.5 bg-slate-200 mx-auto"></div>
+                    <div class="absolute top-1/2 -mt-2 w-4 h-4 rounded-full bg-purple-500 border-2 border-white"></div>
+                </div>
+                <div class="flex-grow pl-4">
+                    <p class="bg-slate-100 rounded-md p-2">${item.action}</p>
+                </div>
+            </div>
+        `).join('');
+
+        updateCharts(data);
+        updateMetrics(data);
+
+        document.getElementById('timeline-label').textContent = `T + ${currentTimeStep}`;
+    }
+
+    function updateMetrics(data) {
+        Object.keys(data.metrics).forEach(key => {
+            const value = data.metrics[key];
+            const prevValue = SIMULATION_DATA[currentState][Math.max(0, currentTimeStep - 1)].metrics[key];
+            const change = value - prevValue;
+
+            document.getElementById(`metric-value-${key}`).textContent = value.toFixed(key.includes('指数') || key.includes('上证') ? 0 : 2);
+            
+            const statusEl = document.getElementById(`metric-status-${key}`);
+            let statusClass = 'bg-amber-100 text-amber-800';
+            let statusText = '持平';
+            if (change > 0.01) {
+                statusClass = 'bg-green-100 text-green-800';
+                statusText = '上升';
+            } else if (change < -0.01) {
+                statusClass = 'bg-red-100 text-red-800';
+                statusText = '下降';
+            }
+            statusEl.className = `text-xs font-semibold px-2 py-0.5 rounded-full ${statusClass}`;
+            statusEl.textContent = statusText;
+
+            const chart = charts[`metric-${key}`];
+            if (chart) {
+                const history = Array.from({length: 7}).map((_, i) => 
+                    SIMULATION_DATA[currentState][Math.max(0, currentTimeStep - 6 + i)].metrics[key]
+                );
+                chart.data.datasets[0].data = history;
+                chart.update('none');
+            }
+        });
+    }
+
+    function updateCharts(data) {
+        const industryChart = charts.industry;
+        industryChart.data.labels = Object.keys(data.industryImpact);
+        industryChart.data.datasets[0].data = Object.values(data.industryImpact);
+        industryChart.data.datasets[0].backgroundColor = Object.values(data.industryImpact).map(v => v >= 0 ? 'rgba(52, 211, 153, 0.7)' : 'rgba(251, 113, 133, 0.7)');
+        industryChart.update();
+
+        const policyMixChart = charts.policyMix;
+        policyMixChart.data.datasets[0].data = [data.policy.mix.fiscal, data.policy.mix.monetary];
+        policyMixChart.update();
+
+        const policyEffectChart = charts.policyEffect;
+        policyEffectChart.data.datasets[0].data = [data.policy.effect.gdp, data.policy.effect.employment];
+        policyEffectChart.update();
+    }
+
+    const statusButtons = document.getElementById('status-buttons');
+    statusButtons.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') {
+            currentState = e.target.dataset.status;
+            Array.from(statusButtons.children).forEach(btn => btn.classList.remove('btn-active'));
+            e.target.classList.add('btn-active');
+            updateDashboard();
+        }
+    });
+
+    const timelineSlider = document.getElementById('timeline-slider');
+    timelineSlider.addEventListener('input', (e) => {
+        currentTimeStep = parseInt(e.target.value, 10);
+        updateDashboard();
+    });
+
+    window.showThreatAnalysis = async (threatName, stateText, timeStep, gdp, cpi, unemployment) => {
+        showModal('分析中...', '正在生成威胁分析和建议...');
+
+        const systemPrompt = "你是一名资深的宏观经济分析师，专注于地缘政治风险对中国经济的影响。请根据给定的宏观经济状态和具体威胁，提供简明扼要的威胁分析和可能的应对建议。回复应直接，不超过200字，侧重于影响和对策。";
+        const userPrompt = `在当前宏观经济状态为 "${stateText}" 且时间步为 "T + ${timeStep}" 的背景下，请分析 "${threatName}" 这一威胁对中国经济的潜在影响，并提供简要应对建议。当前的GDP增长率为 ${gdp.toFixed(1)}%，CPI为 ${cpi.toFixed(1)}%，失业率为 ${unemployment.toFixed(1)}%。`;
+
+        const apiKey = ""; // API key will be provided by Canvas runtime
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        const payload = {
+            contents: [{ parts: [{ text: userPrompt }] }],
+            tools: [{ "google_search": {} }], // Enable grounding
+            systemInstruction: {
+                parts: [{ text: systemPrompt }]
+            },
+        };
+
+        let retries = 0;
+        const maxRetries = 3;
+        let delay = 1000; // 1 second
+
+        while (retries < maxRetries) {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 429) { // Too Many Requests
+                        retries++;
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2; // Exponential backoff
+                        continue;
+                    }
+                    throw new Error(`API error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+                }
+
+                const result = await response.json();
+                const candidate = result.candidates?.[0];
+
+                if (candidate && candidate.content?.parts?.[0]?.text) {
+                    const text = candidate.content.parts[0].text;
+                    let sourcesHtml = '';
+                    const groundingMetadata = candidate.groundingMetadata;
+                    if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                        const sources = groundingMetadata.groundingAttributions
+                            .map(attribution => ({
+                                uri: attribution.web?.uri,
+                                title: attribution.web?.title,
+                            }))
+                            .filter(source => source.uri && source.title);
+                        
+                        if (sources.length > 0) {
+                            sourcesHtml = `<p class="mt-4 text-xs text-slate-500">来源:</p><ul>`;
+                            sources.forEach((source, idx) => {
+                                sourcesHtml += `<li class="text-xs text-slate-500"><a href="${source.uri}" target="_blank" class="hover:underline">${idx + 1}. ${source.title}</a></li>`;
+                            });
+                            sourcesHtml += `</ul>`;
+                        }
+                    }
+                    showModal(`威胁 "${threatName}" 分析`, `<p>${text}</p>${sourcesHtml}`);
+                    return;
+                } else {
+                    throw new Error('API response missing expected content.');
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                showModal('错误', `获取分析失败: ${error.message}`);
+                return;
+            }
+        }
+        showModal('错误', '获取分析失败，请稍后再试。');
+    };
+
+    function showModal(title, content) {
+        document.getElementById('analysis-modal-title').textContent = title;
+        document.getElementById('analysis-modal-content').innerHTML = content;
+        document.getElementById('analysis-modal').classList.remove('hidden');
+    }
+
+    window.hideModal = function() {
+        document.getElementById('analysis-modal').classList.add('hidden');
+    };
+
+    function initialize() {
+        initCharts();
+        statusButtons.querySelector(`[data-status="${currentState}"]`).classList.add('btn-active');
+        updateDashboard();
+    }
+
+    initialize();
+});
+</script>
+
+</body>
+</html>
