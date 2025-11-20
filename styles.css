@@ -101,7 +101,7 @@ body {
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 2s ease-in-out;
 }
 
 .banner-slide.active {
@@ -238,26 +238,16 @@ body {
     transition: left var(--transition-medium);
 }
 
-/* 导航悬停效果 */
-.nav-item:hover::after {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--accent-color);
-    border-radius: 2px;
-    animation: slideIn 0.3s ease-out;
+/* 导航项激活状态 */
+.nav-item.active {
+    color: var(--accent-color);
+    font-weight: 700;
 }
 
-@keyframes slideIn {
-    from {
-        width: 0;
-    }
-    to {
-        width: 100%;
-    }
+/* 导航悬停效果 - 简化为active状态 */
+.nav-item:hover {
+    color: var(--accent-color);
+    font-weight: 700;
 }
 
 /* Hero区域 */
@@ -671,13 +661,21 @@ body {
     color: var(--text-primary);
     margin-bottom: 11px;
     display: flex;
-    align-items: center;
-    gap: 10px;
+    align-items: flex-end;
+    gap: 20px;
 }
 
 .value-icon {
     width: 20px;
     height: 20px;
+    display: flex;
+    align-items: flex-end;
+}
+
+.value-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 /* 案例展示 */
@@ -725,14 +723,16 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 60px;
+    width: var(--underline-width, 100%);
+
     height: 3px;
     background: var(--primary-color);
     border-radius: 2px;
 }
 
-/* 案例导航悬停效果 */
+/* 案例导航悬停效果 - 包含下划线 */
 .cases-nav-item:hover {
+    font-weight: 700;
     color: var(--primary-color);
 }
 
@@ -741,11 +741,10 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 60px;
+    width: var(--underline-width, 100%);
     height: 3px;
-    background: var(--accent-color);
+    background: var(--primary-color);
     border-radius: 2px;
-    animation: slideIn 0.3s ease-out;
 }
 
 .cases-grid {

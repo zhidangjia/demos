@@ -289,16 +289,47 @@ function initCaseNavigation() {
     
     if (!caseNavItems.length) return;
 
+    // 动态设置下划线宽度
+    function updateUnderlineWidth(element) {
+        const textWidth = element.scrollWidth;
+        element.style.setProperty('--underline-width', textWidth + 'px');
+    }
+
     caseNavItems.forEach(item => {
+        // 初始化下划线宽度
+        updateUnderlineWidth(item);
+        
         item.addEventListener('click', function() {
-            // 移除所有active类
-            caseNavItems.forEach(nav => nav.classList.remove('active'));
-            // 添加active类到当前项
+            // 移除所有active类和数据标记
+            caseNavItems.forEach(nav => {
+                nav.classList.remove('active');
+                delete nav.dataset.clicked;
+            });
+            // 添加active类到当前项并标记为已点击
             this.classList.add('active');
+            this.dataset.clicked = 'true';
             
             // 这里可以添加筛选案例的逻辑
             const category = this.textContent.trim();
             filterCases(category);
+        });
+        
+        // 添加hover效果 - 鼠标进入时临时移除其他active状态
+        item.addEventListener('mouseenter', function() {
+            caseNavItems.forEach(nav => nav.classList.remove('active'));
+            this.classList.add('active');
+        });
+        
+        // 鼠标离开时恢复原始的active状态
+        item.addEventListener('mouseleave', function() {
+            // 找到之前点击的active项并恢复
+            const clickedActive = Array.from(caseNavItems).find(nav => 
+                nav.dataset.clicked === 'true'
+            );
+            if (clickedActive) {
+                caseNavItems.forEach(nav => nav.classList.remove('active'));
+                clickedActive.classList.add('active');
+            }
         });
     });
 }
