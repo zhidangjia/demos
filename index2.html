@@ -9,7 +9,8 @@
     :root { --design-width: 1920; --scale: 1; }
     body { margin: 0; }
     .scale-wrapper { width: 100vw; overflow-x: hidden; }
-    .page-container { width: 1920px; margin: 0 auto; transform: scale(var(--scale)); transform-origin: top center; }
+    .page-container { width: 1920px; margin: 0 auto; }
+    .page-container.scaled { position: relative; left: 50%; transform: translateX(-50%) scale(var(--scale)); transform-origin: top left; }
   </style>
   <script src="script.js" defer></script>
 </head>
@@ -323,6 +324,13 @@
         var vw = document.documentElement.clientWidth;
         var scale = Math.min(vw / dw, 1);
         document.documentElement.style.setProperty('--scale', scale);
+        var pc = document.querySelector('.page-container');
+        if (!pc) return;
+        if (scale < 1) {
+          pc.classList.add('scaled');
+        } else {
+          pc.classList.remove('scaled');
+        }
       }
       updateScale();
       window.addEventListener('resize', updateScale);
