@@ -483,17 +483,17 @@ body {
     display: flex;
     justify-content: center;
     flex-wrap: nowrap;
-    gap: 30px;
-    padding: 0 40px; /* 保持PC端原始左右留白 */
+    gap: clamp(16px, 4vw, 30px);
+    padding-inline: clamp(8px, 2.5vw, 40px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: 20px; /* 移动端滚动起止留白，不影响PC布局 */
+    scroll-padding-inline: clamp(8px, 2.5vw, 20px); /* 移动端滚动起止留白，不影响PC布局 */
 }
 
 .service-card {
     position: relative;
-    width: clamp(280px, 88vw, 620px);
+    width: min(620px, 88vw);
     height: auto;
     aspect-ratio: 620 / 388;
     overflow: hidden;
@@ -502,7 +502,7 @@ body {
     visibility: visible;
     flex: 0 0 auto;
     scroll-snap-align: start;
-    scroll-margin-inline: 20px; /* 移动端滚动吸附边距，不影响PC静态布局 */
+    scroll-margin-inline: clamp(8px, 2.5vw, 20px); /* 移动端滚动吸附边距，不影响PC静态布局 */
 }
 
 .service-card img {
@@ -560,21 +560,23 @@ body {
     row-gap: 32px;
     width: max-content;
     margin: 0 auto;
+    padding-inline: clamp(4px, 1.5vw, 20px);
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x proximity;
-    scroll-padding-inline-start: 8px;  /* 减少左侧初始空白（仅影响滚动吸附） */
-    scroll-padding-inline-end: 16px;   /* 防止最右图片被裁剪（滚动吸附） */
+    scroll-padding-inline-start: clamp(8px, 2vw, 16px);  /* 减少左侧初始空白（滚动吸附） */
+    scroll-padding-inline-end: clamp(8px, 2vw, 16px);   /* 防止最右图片被裁剪（滚动吸附） */
 }
 
 .industry-item {
     position: relative;
-    width: clamp(200px, 45vw, 412px);
+    width: min(412px, 45vw);
     height: auto;
     aspect-ratio: 412 / 294;
     overflow: hidden;
     cursor: pointer;
     scroll-snap-align: start;
+    scroll-margin-inline: clamp(8px, 2vw, 16px);
 }
 
 /* 为行业网格首尾项提供滚动吸附边距，避免边缘裁剪（不影响PC静态布局） */
