@@ -11,7 +11,6 @@
     .scale-wrapper { width: 100vw; overflow-x: hidden; }
     .page-container { width: 1920px; margin: 0 auto; }
     .page-container.scaled { position: relative; left: 50%; transform: translateX(calc(-960px * var(--scale))) scale(var(--scale)); transform-origin: top left; }
-    /* 在缩放模式下，industry-grid 使用与 PC 一致的固定像素网格，避免 vw 单位造成尺寸漂移 */
     .page-container.scaled .industry-grid {
       display: grid;
       grid-template-columns: repeat(4, 412px);
@@ -32,6 +31,8 @@
     }
     .page-container.scaled .industry-item:first-child { scroll-margin-left: 0; }
     .page-container.scaled .industry-item:last-child { scroll-margin-right: 0; }
+    .page-container.scaled .service-cards { display: grid; grid-template-columns: repeat(3, 620px); justify-content: center; gap: 30px; overflow: visible; padding: 0; scroll-snap-type: none; }
+    .page-container.scaled .service-card { width: 620px; height: auto; aspect-ratio: 620 / 388; flex: 0 0 auto; scroll-snap-align: unset; scroll-margin-inline: 0; }
   </style>
   <script src="script.js" defer></script>
 </head>
