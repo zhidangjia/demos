@@ -200,14 +200,16 @@ body {
     left: 35%;
     top: 50px;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 90px;
 }
 
 .nav-item {
-    position: absolute;
+    position: relative;
     font-size: 20px;
     color: white;
     white-space: nowrap;
-    top: 0;
     cursor: pointer;
     transition: all var(--transition-fast);
 }
@@ -216,13 +218,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* 导航项定位 */
-.nav-item:nth-child(1) { left: 8px; font-weight: 700; }
-.nav-item:nth-child(2) { left: 113px; font-weight: 400; }
-.nav-item:nth-child(3) { left: 272px; font-weight: 400; }
-.nav-item:nth-child(4) { left: 411px; font-weight: 400; }
-.nav-item:nth-child(5) { left: 546px; font-weight: 400; }
-.nav-item:nth-child(6) { left: 691px; font-weight: 400; }
+/* 导航项等距由 nav-menu 的 gap 控制 */
 
 /* 导航下划线 */
 .nav-underline {
@@ -236,11 +232,8 @@ body {
     transition: left var(--transition-medium);
 }
 
-/* 导航项激活状态 */
-.nav-item.active {
-    color: var(--accent-color);
-    font-weight: 700;
-}
+/* 默认首页为激活态，active 与 hover 保持一致视觉 */
+.nav-item.active { color: var(--accent-color); font-weight: 700; }
 
 /* 导航悬停效果 - 简化为active状态 */
 .nav-item:hover {
@@ -489,7 +482,9 @@ body {
     -webkit-overflow-scrolling: touch;
     scroll-snap-type: x mandatory;
     scroll-padding-inline: clamp(8px, 2.5vw, 20px); /* 移动端滚动起止留白，不影响PC布局 */
+    scrollbar-width: none; /* 隐藏滚动条（Firefox）*/
 }
+.service-cards::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .service-card {
     position: relative;
@@ -566,7 +561,9 @@ body {
     scroll-snap-type: x proximity;
     scroll-padding-inline-start: clamp(8px, 2vw, 16px);  /* 减少左侧初始空白（滚动吸附） */
     scroll-padding-inline-end: clamp(8px, 2vw, 16px);   /* 防止最右图片被裁剪（滚动吸附） */
+    scrollbar-width: none; /* 隐藏滚动条（Firefox）*/
 }
+.industry-grid::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 .industry-item {
     position: relative;

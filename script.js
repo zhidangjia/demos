@@ -150,6 +150,11 @@ function initNavigation() {
     
     if (!navItems.length || !navUnderline) return;
 
+    const defaultActive = document.querySelector('.nav-item.active');
+    if (defaultActive) {
+        defaultActive.dataset.clicked = 'true';
+    }
+
     // 为每个导航项添加悬停效果
     navItems.forEach((item, index) => {
         item.addEventListener('mouseenter', function() {
@@ -160,6 +165,22 @@ function initNavigation() {
             
             navUnderline.style.left = left + 'px';
             navUnderline.style.width = itemRect.width + 'px';
+
+            navItems.forEach(nav => nav.classList.remove('active'));
+        });
+
+        item.addEventListener('mouseleave', function() {
+            const clickedActive = Array.from(navItems).find(nav => nav.dataset.clicked === 'true');
+            if (clickedActive) {
+                navItems.forEach(nav => nav.classList.remove('active'));
+                clickedActive.classList.add('active');
+
+                const itemRect = clickedActive.getBoundingClientRect();
+                const navRect = clickedActive.parentElement.getBoundingClientRect();
+                const left = itemRect.left - navRect.left;
+                navUnderline.style.left = left + 'px';
+                navUnderline.style.width = itemRect.width + 'px';
+            }
         });
 
         item.addEventListener('click', function() {
@@ -167,6 +188,8 @@ function initNavigation() {
             navItems.forEach(nav => nav.classList.remove('active'));
             // 添加active类到当前项
             this.classList.add('active');
+            navItems.forEach(nav => { delete nav.dataset.clicked; });
+            this.dataset.clicked = 'true';
             
             // 更新下划线位置
             const itemRect = this.getBoundingClientRect();
