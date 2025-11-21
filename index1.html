@@ -9,7 +9,7 @@
         .page-container { position: relative; width: 1920px; height: 5200px; margin: 0 auto; }
         .banner-section { position: absolute; left: 0; top: 0; width: 1920px; height: 680px; }
         .logo { position: absolute; left: 102px; top: 39px; width: 172px; height: 54px; }
-        .nav-menu { position: absolute; left: 672px; top: 50px; }
+        .nav-menu { position: absolute; left: 50%; transform: translateX(-50%); top: 50px; }
         .stats-section { position: absolute; left: 0; top: 760px; width: 1920px; }
         .services-section { position: absolute; left: 0; top: 1200px; width: 1920px; }
         .industries-section { position: absolute; left: 0; top: 1880px; width: 1920px; height: 800px; }
@@ -24,9 +24,18 @@
         .industry-item:nth-child(7) { left: 886px; top: 326px; }
         .industry-item:nth-child(8) { left: 1329px; top: 326px; }
         .values-section { position: absolute; left: 0; top: 2710px; width: 1920px; height: 384px; }
-        .cases-section { position: absolute; left: 0; top: 3174px; width: 1920px; }
-        .partners-section { position: absolute; left: 0; top: 4774px; width: 1920px; }
+        .cases-section { position: absolute; left: 0; top: 3154px; width: 1920px; }
+        .partners-section { position: absolute; left: 0; top: 4704px; width: 1920px; }
         .footer-section { position: absolute; left: 0; top: 5000px; width: 1920px; }
+        .cases-title { position: absolute; left: 50%; transform: translateX(-50%); top: 0px; }
+        .cases-subtitle { position: absolute; }
+        .service-cards { position: absolute; left: 0px; top: 160px; width: 1920px; height: 388px; }
+        .service-card { position: absolute; top: 0px; }
+        .service-card:nth-child(1) { left: 0px; }
+        .service-card:nth-child(2) { left: 650px; }
+        .service-card:nth-child(3) { left: 1280px; }
+        .tags-container { flex-wrap: nowrap; }
+        .cases-nav { margin-top: 100px; }
     </style>
     <script src="script.js" defer></script>
 </head>
@@ -360,5 +369,25 @@
             </div>
         </footer>
     </div>
+    <script>
+    document.addEventListener('DOMContentLoaded',function(){
+      var section=document.querySelector('.cases-section');
+      var title=document.querySelector('.cases-title');
+      var subtitle=document.querySelector('.cases-subtitle');
+      function pos(){
+        if(!section||!title||!subtitle) return;
+        var sRect=section.getBoundingClientRect();
+        var tRect=title.getBoundingClientRect();
+        var subRect=subtitle.getBoundingClientRect();
+        var left=tRect.right - sRect.left + 90;
+        var top=tRect.bottom - sRect.top - subRect.height -16;
+        subtitle.style.left=left+'px';
+        subtitle.style.top=top+'px';
+      }
+      pos();
+      var handler=(window.zijinDesign&&window.zijinDesign.debounce)?window.zijinDesign.debounce(pos,100):pos;
+      window.addEventListener('resize',handler);
+    });
+    </script>
     </body>
 </html>
