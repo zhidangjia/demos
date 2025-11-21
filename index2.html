@@ -2,15 +2,14 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   <title>紫金设计 - 响应式文档流（比例缩放）</title>
   <link rel="stylesheet" href="styles.css">
   <style>
-    :root { --design-width: 1920; --scale: calc(100vw / var(--design-width)); }
+    :root { --design-width: 1920; --scale: 1; }
     body { margin: 0; }
     .scale-wrapper { width: 100vw; overflow-x: hidden; }
     .page-container { width: 1920px; margin: 0 auto; transform: scale(var(--scale)); transform-origin: top center; }
-    .banner-section { height: 35.4167vw; }
   </style>
   <script src="script.js" defer></script>
 </head>
@@ -322,7 +321,7 @@
       function updateScale(){
         var dw = 1920;
         var vw = document.documentElement.clientWidth;
-        var scale = vw / dw;
+        var scale = Math.min(vw / dw, 1);
         document.documentElement.style.setProperty('--scale', scale);
       }
       updateScale();
