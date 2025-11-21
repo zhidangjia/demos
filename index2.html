@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=0, maximum-scale=0, user-scalable=yes,shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
   <title>紫金设计 - 响应式文档流（比例缩放）</title>
   <link rel="stylesheet" href="styles.css">
   <style>
@@ -317,5 +317,18 @@
       </footer>
     </div>
   </div>
+  <script>
+    (function(){
+      function updateScale(){
+        var dw = 1920;
+        var vw = document.documentElement.clientWidth;
+        var scale = vw / dw;
+        document.documentElement.style.setProperty('--scale', scale);
+      }
+      updateScale();
+      window.addEventListener('resize', updateScale);
+      window.addEventListener('orientationchange', updateScale);
+    })();
+  </script>
 </body>
 </html>
