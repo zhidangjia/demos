@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <title>近期项目案例 | 朱岸峰</title>
+    <meta name="nav-current" content="cases|screen">
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+    <div class="page-container">
+
+
+        <section class="industries-section">
+            <div class="filter-bar">
+                <button class="filter-btn" id="btn-time">全部时间</button>
+                <button class="filter-btn" id="btn-sort">项目排序</button>
+                <button class="filter-btn" id="btn-industry">行业分类</button>
+                <div class="dropdown" id="dropdown-time">
+                    <div class="dropdown-row">
+                        <input type="date" id="start-date">
+                        <span class="dropdown-sep">至</span>
+                        <input type="date" id="end-date">
+                    </div>
+                    <div class="dropdown-actions">
+                        <button class="dropdown-btn" id="time-apply">应用</button>
+                        <button class="dropdown-btn" id="time-clear">清空</button>
+                    </div>
+                </div>
+                <div class="dropdown" id="dropdown-sort">
+                    <div class="dropdown-row">
+                        <button class="sort-time-toggle" id="sort-time-toggle" data-order="asc">按时间排序</button>
+                        <button class="sort-name-toggle" id="sort-name-toggle" data-order="asc">按名称排序</button>
+                    </div>
+                </div>
+                <div class="dropdown" id="dropdown-industry">
+                    <div id="industry-list" class="dropdown-columns"></div>
+                    <div id="subindustry-list" class="dropdown-columns"></div>
+                </div>
+            </div>
+            <div class="industry-grid" id="industry-grid"></div>
+        </section>
+
+
+    </div>
+
+    <script id="industry-data" type="application/json">[
+{"id":"screen-01","name":"某部委数据引接平台项目（2024）","date":"2024-11-01","industry":"军工","subIndustries":[],"image":"/images/cases/某部委数据引接平台项目.webp","data-link":"/detail/shuju-yinjie.html"}
+]</script>
+    <script>
+    </script>
+
+</body>
+
+</html>
