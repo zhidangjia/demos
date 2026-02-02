@@ -2103,6 +2103,80 @@ body {
     grid-column: 1 / -1;
 }
 
+.detail-flow {
+    width: 100%;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.flow-row {
+    display: flex;
+    align-items: stretch;
+    gap: 16px;
+}
+
+.flow-step {
+    flex: 1;
+    background: #F5F7FB;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.flow-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.flow-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #5e49d2;
+    font-size: 48px;
+    padding: 0 8px;
+    opacity: 0.35;
+    transition: opacity 0.3s ease, transform 0.3s ease, color 0.3s ease;
+}
+
+.flow-arrow.is-active {
+    opacity: 1;
+    transform: scale(1.2);
+    color: #5e49d2;
+    text-shadow: 0 0 8px rgba(94, 73, 210, 0.4);
+}
+
+.flow-step.is-highlight {
+    background: #ECEFFF;
+    box-shadow: 0 0 0 2px #5e49d2 inset, 0 8px 24px rgba(0, 0, 0, 0.06);
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+    .flow-row {
+        flex-direction: column;
+    }
+    .flow-arrow {
+        display: none;
+    }
+}
+
 /* 图片点击放大 Lightbox */
 .image-lightbox {
     position: fixed;

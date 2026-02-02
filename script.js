@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initGlobalActiveNav();
     initGlobalFooter();
     initDetailImageZoom();
+    initFlowAnimation();
     setDetailPaddingTop();
 });
 
@@ -992,4 +993,56 @@ function setDetailPaddingTop() {
         var designPx = Math.round(rect.bottom / Math.max(scale, 0.0001));
         document.documentElement.style.setProperty('--detail-padding-top', designPx + 'px');
     } catch (e) {}
+}
+
+function initFlowAnimation() {
+    var flow = document.querySelector('.detail-flow .flow-row');
+    if (!flow) return;
+    var steps = flow.querySelectorAll('.flow-step');
+    var arrows = flow.querySelectorAll('.flow-arrow');
+    if (!steps.length || !arrows.length) return;
+    var i = 0;
+    var running = false;
+    function tick() {
+        arrows.forEach(function (a) { a.classList.remove('is-active'); });
+        steps.forEach(function (s) { s.classList.remove('is-highlight'); });
+        var idx = i % arrows.length;
+        function runArrow() {
+            arrows[idx].classList.add('is-active');
+            setTimeout(function () {
+                var target = steps[idx + 1];
+                if (target) {
+                    target.classList.add('is-highlight');
+                    setTimeout(function () { target.classList.remove('is-highlight'); }, 600);
+                }
+            }, 400);
+        }
+        if (idx === 0 && steps[0]) {
+            steps[0].classList.add('is-highlight');
+            setTimeout(function () { steps[0].classList.remove('is-highlight'); }, 600);
+            setTimeout(runArrow, 300);
+        } else {
+            runArrow();
+        }
+        i++;
+    }
+    var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+            if (entry.isIntersecting && !running) {
+                running = true;
+                steps[0].classList.add('is-highlight');
+                setTimeout(function () { steps[0].classList.remove('is-highlight'); }, 600);
+                setTimeout(function () {
+                    tick();
+                    flow.__timer = setInterval(tick, 1200);
+                }, 900);
+            } else if (!entry.isIntersecting && running) {
+                running = false;
+                arrows.forEach(function (a) { a.classList.remove('is-active'); });
+                steps.forEach(function (s) { s.classList.remove('is-highlight'); });
+                if (flow.__timer) { clearInterval(flow.__timer); flow.__timer = null; }
+            }
+        });
+    }, { threshold: 0.2 });
+    io.observe(flow);
 }
