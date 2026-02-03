@@ -1435,7 +1435,7 @@ body {
 .page-container.scaled .footer-section {
     width: 1920px;
     margin: 60px auto;
-    padding: 0;
+    padding: 90px 0px;
 }
 
 .page-container.scaled .industry-grid {
@@ -1883,7 +1883,7 @@ body {
 .banner-content {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%) translateY(120px);
     bottom: 60px;
     text-align: center;
     color: #ffffff;
@@ -1941,8 +1941,8 @@ body {
 .detail-container {
     width: 1352px;
     margin: 0 auto;
-    padding: var(--detail-padding-top, 0px) 0 40px;
-    /* padding: var(--detail-padding-top, 160px) 0 40px; */
+    /* padding: var(--detail-padding-top, 0px) 0 40px; */
+    padding: var(--detail-padding-top, 160px) 0 40px;
 }
 
 .detail-title {
@@ -2202,16 +2202,16 @@ body {
 
     /* .detail-container { padding-top: 140px; } */
     .detail-container {
-        /* padding-top: var(--detail-padding-top, 160px); */
-        padding-top: var(--detail-padding-top, 0px);
+        padding-top: var(--detail-padding-top, 160px);
+        /* padding-top: var(--detail-padding-top, 0px); */
     }
 
 }
 
 @media (max-width: 1024px) {
     .detail-container {
-        padding-top: var(--detail-padding-top, 0px);
-        /* padding-top: var(--detail-padding-top, 160px); */
+        /* padding-top: var(--detail-padding-top, 0px); */
+        padding-top: var(--detail-padding-top, 160px);
     }
 
     /* .detail-grid { grid-template-columns: 1fr; row-gap: 28px; }

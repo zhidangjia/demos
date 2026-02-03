@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>贸易战宏观经济推演系统</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+        }
+
+        /* 4K分辨率基础设置 */
+        body {
+            width: 100vw;
+            height: 100vh;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            font-size: 16px;
+            overflow: hidden;
+        }
+
+        /* 整体容器 - 左中右三栏 */
+        .container {
+            display: grid;
+            grid-template-columns: 28% 44% 28%;
+            grid-template-rows: 8% 84% 8%;
+            grid-template-areas:
+                "header header header"
+                "us-panel main-panel cn-panel"
+                "footer footer footer";
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            gap: 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            grid-area: header;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #334155;
+            padding: 0 20px;
+            flex-wrap: nowrap;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: #38bdf8;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .state-switch {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin: 0 20px;
+        }
+
+        .state-switch label {
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .state-switch input {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        /* 轮次切换控件样式 */
+        .round-switch {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin: 0 20px;
+            white-space: nowrap;
+        }
+
+        .round-switch label {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+        }
+
+        .round-select {
+            padding: 8px 12px;
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            outline: none;
+            min-width: 200px;
+        }
+
+        .round-select option {
+            background-color: #0f172a;
+            color: #e2e8f0;
+        }
+
+        .time-axis-control {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            white-space: nowrap;
+        }
+
+        .time-axis-control button {
+            padding: 8px 16px;
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .time-axis-control button:hover {
+            background-color: #3b82f6;
+        }
+
+        .time-axis-control span {
+            font-size: 1.2rem;
+            color: #38bdf8;
+            font-weight: 500;
+        }
+
+        /* 底部 */
+        .footer {
+            grid-area: footer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 2px solid #334155;
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        /* 通用面板样式 */
+        .panel {
+            background-color: #1e293b;
+            border-radius: 8px;
+            padding: 16px;
+            border: 1px solid #334155;
+        }
+
+        .panel-title {
+            font-size: 1.5rem;
+            color: #38bdf8;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .badge-normal {
+            background-color: #10b981;
+            color: #fff;
+        }
+
+        .badge-crisis {
+            background-color: #f59e0b;
+            color: #fff;
+        }
+
+        .badge-war {
+            background-color: #ef4444;
+            color: #fff;
+        }
+
+        /* 新增：大盘云图通用样式 - 适配4K，预留接口替换空间 */
+        .market-cloud {
+            width: 100%;
+            height: 180px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #0f172a;
+        }
+
+        .market-cloud img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .market-cloud-tip {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-align: center;
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        /* 美方措施面板 - 左侧：新增纳斯达克云图，调整布局比例 */
+        .us-panel {
+            grid-area: us-panel;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .us-panel>div:first-child {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+            flex: 0 0 auto;
+            flex: 1;
+
+        .measure-list {
+            overflow-y: visible;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            align-items: stretch;
+            justify-content: flex-start;
+        }
+
+        .measure-item {
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 4px;
+            border-left: 4px solid #ef4444;
+        }
+
+        .measure-date {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #38bdf8;
+            margin-bottom: 12px;
+        }
+
+        .measure-content {
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .measure-progress {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.6;
+            padding-top: 8px;
+            border-top: 1px dashed #334155;
+        }
+
+        .threat-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .threat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.5;
+        }
+
+        .threat-item::before {
+            content: "!";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background-color: #ef4444;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.8rem;
+        }
+
+        /* 中方对策面板 - 右侧：新增A股云图，匹配左侧布局比例 */
+        .cn-panel {
+            grid-area: cn-panel;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .cn-panel>div:first-child {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+            flex: 0 0 auto;
+            flex: 1;
+        }
+            overflow-y: visible;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            align-items: stretch;
+            justify-content: flex-start;
+            flex-direction: column;
+
+        .countermeasure-item {
+            background-color: #0f172a;
+            padding: 16px;
+            border-radius: 4px;
+            border-left: 4px solid #10b981;
+        }
+
+        .countermeasure-date {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #38bdf8;
+            margin-bottom: 12px;
+        }
+
+        .countermeasure-content {
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .countermeasure-progress {
+            font-size: 0.95rem;
+            color: #94a3b8;
+            line-height: 1.6;
+            padding-top: 8px;
+            border-top: 1px dashed #334155;
+        }
+
+        .industry-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .industry-item {
+            background-color: #0f172a;
+            padding: 12px;
+            border-radius: 4px;
+            border-bottom: 2px solid #38bdf8;
+        }
+
+        .industry-name {
+            font-weight: 500;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .industry-impact-level {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .impact-bar {
+            flex: 1;
+            height: 6px;
+            background-color: #334155;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .impact-bar-inner {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .impact-low {
+            background-color: #10b981;
+            width: 20%;
+        }
+
+        .impact-mid {
+            background-color: #f59e0b;
+            width: 50%;
+        }
+
+        .impact-high {
+            background-color: #ef4444;
+            width: 80%;
+        }
+
+        /* 主面板 - 中间 经济指标 */
+        .main-panel {
+            grid-area: main-panel;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .economic-status {
+            font-size: 1.2rem;
+            color: #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .status-desc {
+            color: #94a3b8;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+
+        .indicator-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 16px;
+            /* height: 100%; */
+        }
+
+        .indicator-card {
+            background-color: #0f172a;
+            border-radius: 8px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid #334155;
+            transition: all 0.3s;
+        }
+
+        .indicator-card:hover {
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+        }
+
+        .indicator-name {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 8px;
+        }
+
+        .indicator-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .indicator-change {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .rise {
+            color: #ef4444;
+        }
+
+        .fall {
+            color: #10b981;
+        }
+
+        .stable {
+            color: #94a3b8;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 40%;
+            border-radius: 8px;
+            background-color: #0f172a;
+            padding: 8px;
+        }
+
+        .policy-effect {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #94a3b8;
+            line-height: 1.4;
+            width: 100%;
+        }
+
+        #map {
+            flex: 1 1 auto;
+            min-height: 240px;
+            z-index: 999;
+        }
+
+        /* 滚动条样式优化 */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #334155;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #64748b;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 响应式适配 - 4K核心布局保留 */
+        @media screen and (max-width: 3840px) {
+            html {
+                font-size: 14px;
+            }
+
+            .indicator-value {
+                font-size: 1.6rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .round-switch,
+            .state-switch,
+            .time-axis-control {
+                gap: 12px;
+            }
+
+            .market-cloud {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header">
+            <h1>贸易战宏观经济推演系统</h1>
+            <div class="state-switch">
+                <label><input type="radio" name="economic-state" value="normal" checked> 常态 <span
+                        class="badge badge-normal">稳定</span></label>
+                <label><input type="radio" name="economic-state" value="crisis"> 危机态 <span
+                        class="badge badge-crisis">波动</span></label>
+                <label><input type="radio" name="economic-state" value="war"> 战争态 <span
+                        class="badge badge-war">冲击</span></label>
+            </div>
+            <div class="round-switch">
+                <label for="trade-round">2025对战轮次：</label>
+                <select id="trade-round" class="round-select">
+                    <option value="0">第1轮 - 2025年2月1日（首轮芬太尼关税）</option>
+                    <option value="1">第2轮 - 2025年3月3日（次轮芬太尼关税）</option>
+                    <option value="2">第3轮 - 2025年4月2日（34%对等关税）</option>
+                    <option value="3">第4轮 - 2025年4月8日（关税战白热化）</option>
+                    <option value="4">第5轮 - 2025年4月9日（税率达145%）</option>
+                    <option value="5">第6轮 - 2025年5月10-11日（日内瓦会谈）</option>
+                    <option value="6">第7轮 - 2025年8月12日（斯德哥尔摩共识）</option>
+                    <option value="7" selected>第8轮 - 2025年10月30日（釜山会晤）</option>
+                </select>
+            </div>
+            <div class="time-axis-control">
+                <button id="prev-step">上一步</button>
+                <span id="current-time">2025年10月30日 贸易战当前阶段</span>
+                <button id="next-step">下一步</button>
+            </div>
+        </div>
+
+        <!-- 左侧：美方措施面板 - 新增【纳斯达克大盘云图】 -->
+        <div class="panel us-panel">
+            <div>
+                <div class="panel-title">美方加征措施 <span class="badge badge-normal" id="us-state-badge">常态</span></div>
+
+                <div class="measure-list" id="us-measure-list">
+                    <!-- 美方措施由JS根据轮次动态生成 -->
+                </div>
+            </div>
+            <!-- 新增：纳斯达克大盘云图（图片占位） -->
+            <div class="market-cloud" id="nasdaq-cloud">
+                <img src="/images/cases/hongguan-jingji/sec_ndx_d1_003360341.jpg" alt="纳斯达克大盘云图">
+            </div>
+            <p class="market-cloud-tip">纳斯达克大盘云图（实时数据接口预留）</p>
+            <div class="economic-threat">
+                <div class="panel-title">经济威胁清单</div>
+                <ul class="threat-list">
+                    <li class="threat-item">芯片出口管制（50%穿透性规则）</li>
+                    <li class="threat-item">高科技产品贸易壁垒升级</li>
+                    <li class="threat-item">盟友贸易制裁协同要求</li>
+                    <li class="threat-item">美元结算体系限制</li>
+                    <li class="threat-item">海外投资审查加码</li>
+                    <li class="threat-item">能源贸易限制</li>
+                    <li class="threat-item">农产品关税壁垒</li>
+                </ul>
+            </div>
+            
+        </div>
+
+        <!-- 中间：主面板 - 经济指标+态势+图表 -->
+        <div class="panel main-panel">
+            <div>
+                <div class="panel-title">宏观经济指标面板 <span class="badge badge-normal" id="main-state-badge">常态</span></div>
+                <div class="economic-status" id="economic-status">当前国民经济运行态势：平稳恢复，韧性增强</div>
+                <div class="status-desc" id="status-desc">
+                    受贸易战阶段性缓和影响，进出口贸易边际改善，工业生产稳步回升，消费市场持续复苏，主要经济指标均处于合理区间，政策对冲效果逐步显现。</div>
+                <div class="indicator-container" id="indicator-container">
+                    <!-- 经济指标卡片由JS动态生成 -->
+                </div>
+            </div>
+            <!-- <div class="map-container">
+                <div id="map"></div>
+                <script>
+                    // TO MAKE THE MAP APPEAR YOU MUST
+                    // ADD YOUR ACCESS TOKEN FROM
+                    // https://account.mapbox.com
+                    mapboxgl.accessToken = 'pk.eyJ1IjoiZ29kd2l0IiwiYSI6ImNtZXdvd3VncTByZzAya3EyYnFremZtZmQifQ.SLSZ5a4ExscQl4b_Tmq-6g';
+                    const map = new mapboxgl.Map({
+                        container: 'map', // container ID
+                        center: [119.948195, 24.525070], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+                        zoom: 5 // starting zoom
+                    });
+                </script>
+            </div> -->
+
+
+            <div class="chart-container" id="main-chart">
+                <!-- ECharts图表由JS动态生成 -->
+            </div>
+
+        </div>
+
+        <!-- 右侧：中方对策面板 - 新增【A股大盘云图】 -->
+        <div class="panel cn-panel">
+            <div>
+                <div class="panel-title">中方反制措施 <span class="badge badge-normal" id="cn-state-badge">常态</span></div>
+
+                <div class="countermeasure-list" id="cn-countermeasure-list">
+                    <!-- 中方对策由JS根据轮次动态生成 -->
+                </div>
+            </div>
+            <!-- 新增：A股大盘云图（图片占位） -->
+            <div class="market-cloud" id="a-share-cloud">
+                <img src="/images/cases/hongguan-jingji/大盘云图 2026-02-03 13_37.jpg" alt="A股大盘云图">
+            </div>
+            <p class="market-cloud-tip">A股大盘云图（实时数据接口预留）</p>
+            <div class="industry-impact">
+                <div class="panel-title">重点产业链受影响情况</div>
+                <ul class="industry-list" id="industry-list">
+                    <!-- 重点产业链由JS动态生成 -->
+                </ul>
+            </div>
+            
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer">
+            贸易战宏观经济推演系统 © 2026 | 2025年8轮对战数据模拟推演 | 纳斯达克/A股云图为图片占位，预留实时接口 | 涵盖20+贸易国家/9+经济模型要素/5+外生冲击量化指标
+        </div>
+    </div>
+
+    <script>
+        // 全局状态（无修改，保留原有所有数据）
+        const globalState = {
+            currentState: 'normal',
+            currentTimeStep: 0,
+            currentRound: 7,
+            timeSteps: [
+                '2025-10-30 釜山会晤后',
+                '2025-12 关税暂停期中期',
+                '2026-02 关税暂停期到期前',
+                '2026-03 新一轮贸易谈判',
+                '2026-06 贸易政策调整落地'
+            ],
+            tradeRounds: [
+                {
+                    round: 1,
+                    date: '2025年2月1日',
+                    usMeasure: '以 “芬太尼管控” 为由，对中国全品类输美商品加征 10% 关税（首轮芬太尼关税）。',
+                    cnCountermeasure: '3 月 10 日对美鸡肉、小麦等农产品加征 10%-15% 关税，并将因美纳公司列入不可靠实体清单。',
+                    progress: '美方关税范围扩大至全品类，中方反制聚焦美国农业票仓领域。'
+                },
+                {
+                    round: 2,
+                    date: '2025年3月3日',
+                    usMeasure: '以 “中方未有效配合芬太尼管控” 为由，对中国输美商品再加征 10% 关税（次轮芬太尼关税），累计芬太尼相关关税达 20%。',
+                    cnCountermeasure: '强化稀土出口管制，对美半导体设备零部件加征反制关税，新增 15 家美实体至出口管制名单。',
+                    progress: '中方动用战略资源牵制，美方高科技产业开始出现成本压力。'
+                },
+                {
+                    round: 3,
+                    date: '2025年4月2日',
+                    usMeasure: '依据 “逆差比例折算法”（贸易逆差 ÷ 出口额 ÷2），对中国输美商品加征 34% 对等关税（无额外 10% 基准关税，此前计算有误已修正）。',
+                    cnCountermeasure: '4 月 4 日对美商品加征 34% 关税，覆盖全品类，实现税率对等反制。',
+                    progress: '关税进入 “极限升级” 阶段，双方税率快速攀升。'
+                },
+                {
+                    round: 4,
+                    date: '2025年4月8日',
+                    usMeasure: '因中方反制，追加加征 50% 报复性关税，累计税率达 34%（对等）+20%（芬太尼）+50%（报复）=104%。',
+                    cnCountermeasure: '4 月 9 日将对美反制关税升至 84%，进一步强化反制力度。',
+                    progress: '关税战白热化，美国内通胀与企业成本压力显著上升。'
+                },
+                {
+                    round: 5,
+                    date: '2025年4月9日',
+                    usMeasure: '再次追加 41% 报复性关税，累计税率达 34%+20%+50%+41%=145%；同时终止 800 美元以下小额包裹免税政策。',
+                    cnCountermeasure: '4 月 11 日将对美反制关税进一步提高至 125%，反制力度同步升级。',
+                    progress: '美国国际贸易法院开始受理关税合法性诉讼，中方同步向 WTO 提起申诉。'
+                },
+                {
+                    round: 6,
+                    date: '2025年5月10-11日',
+                    usMeasure: '无新增加征，与中方在瑞士日内瓦举行经贸高层会谈。',
+                    cnCountermeasure: '无新增反制，参会协商关税调整事宜。',
+                    progress: '5 月 12 日发布联合声明：①美方取消 4 月 8 日、9 日追加的 91% 关税；②将 34% 对等关税拆分为 10% 保留、24% 暂停 90 天；③中方同步取消 91% 反制关税，拆分 34% 反制关税为 10% 保留、24% 暂停。'
+                },
+                {
+                    round: 7,
+                    date: '2025年8月12日',
+                    usMeasure: '无新增加征，执行斯德哥尔摩会谈共识。',
+                    cnCountermeasure: '无新增反制，同步调整反制政策。',
+                    progress: '将 24% 对等关税暂停期延长 90 天，当前累计税率维持 10%（对等保留）+20%（芬太尼）=30%。'
+                },
+                {
+                    round: 8,
+                    date: '2025年10月30日',
+                    usMeasure: '釜山元首会晤后，宣布取消 2025 年 2 月 1 日加征的 10% 首轮芬太尼关税；将 24% 对等关税暂停期延长一年。',
+                    cnCountermeasure: '相应取消针对首轮芬太尼关税的反制措施，同步延长 24% 反制关税暂停期一年。',
+                    progress: '美方暂停芯片出口管制 “50% 穿透性规则” 一年，中方暂停稀土出口管制新规一年；当前美方实际执行税率为 10%（对等保留）+10%（次轮芬太尼）=20%。'
+                }
+            ],
+            baseIndicatorsByRound: [
+                [
+                    { name: 'GDP(季度)', value: '29.0万亿', change: '+4.5%', type: 'rise', desc: '政策发力带动经济回升' },
+                    { name: 'CPI', value: '1.1%', change: '+0.2%', type: 'stable', desc: '物价水平总体稳定' },
+                    { name: 'PPI', value: '-0.6%', change: '-0.1%', type: 'fall', desc: '工业品价格降幅收窄' },
+                    { name: '城镇调查失业率', value: '5.3%', change: '-0.1%', type: 'fall', desc: '就业形势稳中向好' },
+                    { name: '出口额(月)', value: '2.30万亿', change: '+4.2%', type: 'rise', desc: '外贸韧性持续显现' },
+                    { name: '外汇储备', value: '3.16万亿$', change: '+0.1%', type: 'stable', desc: '汇率保持基本稳定' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '28.8万亿', change: '+4.3%', type: 'rise', desc: '关税加码，增速小幅回落' },
+                    { name: 'CPI', value: '1.0%', change: '+0.1%', type: 'stable', desc: '通胀温和可控' },
+                    { name: 'PPI', value: '-0.7%', change: '-0.2%', type: 'fall', desc: '工业品价格承压' },
+                    { name: '城镇调查失业率', value: '5.4%', change: '+0.1%', type: 'rise', desc: '就业压力边际上升' },
+                    { name: '出口额(月)', value: '2.25万亿', change: '+3.8%', type: 'rise', desc: '外需放缓但韧性仍在' },
+                    { name: '外汇储备', value: '3.15万亿$', change: '0.0%', type: 'stable', desc: '汇率基本稳定' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '28.5万亿', change: '+3.9%', type: 'rise', desc: '对等关税抑制需求' },
+                    { name: 'CPI', value: '0.9%', change: '-0.1%', type: 'stable', desc: '通胀持平略降' },
+                    { name: 'PPI', value: '-1.0%', change: '-0.3%', type: 'fall', desc: '工业部门价格回落' },
+                    { name: '城镇调查失业率', value: '5.5%', change: '+0.2%', type: 'rise', desc: '就业市场承压' },
+                    { name: '出口额(月)', value: '2.20万亿', change: '+3.5%', type: 'rise', desc: '出口增速趋缓' },
+                    { name: '外汇储备', value: '3.14万亿$', change: '-0.1%', type: 'fall', desc: '外汇占款小幅波动' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '28.2万亿', change: '+3.5%', type: 'rise', desc: '报复性关税显著压制' },
+                    { name: 'CPI', value: '1.2%', change: '+0.4%', type: 'rise', desc: '输入型通胀抬头' },
+                    { name: 'PPI', value: '-1.3%', change: '-0.4%', type: 'fall', desc: '工业价格继续走低' },
+                    { name: '城镇调查失业率', value: '5.7%', change: '+0.3%', type: 'rise', desc: '用工需求下降' },
+                    { name: '出口额(月)', value: '2.05万亿', change: '-1.2%', type: 'fall', desc: '外需受阻，订单走弱' },
+                    { name: '外汇储备', value: '3.12万亿$', change: '-0.2%', type: 'fall', desc: '跨境资金波动加剧' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '28.0万亿', change: '+3.3%', type: 'rise', desc: '极限关税阶段，增速明显下行' },
+                    { name: 'CPI', value: '1.4%', change: '+0.5%', type: 'rise', desc: '关税传导推升物价' },
+                    { name: 'PPI', value: '-1.5%', change: '-0.5%', type: 'fall', desc: '工业端价格承压加深' },
+                    { name: '城镇调查失业率', value: '5.9%', change: '+0.4%', type: 'rise', desc: '就业承压上行' },
+                    { name: '出口额(月)', value: '1.95万亿', change: '-2.0%', type: 'fall', desc: '出口阶段性下滑' },
+                    { name: '外汇储备', value: '3.10万亿$', change: '-0.3%', type: 'fall', desc: '储备小幅回落' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '28.6万亿', change: '+3.8%', type: 'rise', desc: '会谈缓和，经济边际改善' },
+                    { name: 'CPI', value: '1.1%', change: '+0.2%', type: 'stable', desc: '通胀回归温和区间' },
+                    { name: 'PPI', value: '-1.0%', change: '-0.3%', type: 'fall', desc: '工业价格回稳' },
+                    { name: '城镇调查失业率', value: '5.6%', change: '-0.1%', type: 'fall', desc: '就业边际改善' },
+                    { name: '出口额(月)', value: '2.15万亿', change: '+2.5%', type: 'rise', desc: '订单恢复，出口回升' },
+                    { name: '外汇储备', value: '3.12万亿$', change: '+0.1%', type: 'stable', desc: '汇率稳定' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '29.2万亿', change: '+4.2%', type: 'rise', desc: '共识执行，增长修复' },
+                    { name: 'CPI', value: '1.0%', change: '+0.1%', type: 'stable', desc: '物价平稳' },
+                    { name: 'PPI', value: '-0.9%', change: '-0.2%', type: 'fall', desc: '工业价格改善' },
+                    { name: '城镇调查失业率', value: '5.3%', change: '-0.2%', type: 'fall', desc: '就业持续改善' },
+                    { name: '出口额(月)', value: '2.30万亿', change: '+4.2%', type: 'rise', desc: '外贸恢复动能' },
+                    { name: '外汇储备', value: '3.15万亿$', change: '+0.2%', type: 'stable', desc: '储备回升' }
+                ],
+                [
+                    { name: 'GDP(季度)', value: '29.6万亿', change: '+4.8%', type: 'rise', desc: '取消部分关税，修复加速' },
+                    { name: 'CPI', value: '1.2%', change: '+0.3%', type: 'stable', desc: '物价总体稳定' },
+                    { name: 'PPI', value: '-0.8%', change: '-0.2%', type: 'fall', desc: '工业品价格降幅收窄' },
+                    { name: '城镇调查失业率', value: '5.2%', change: '-0.1%', type: 'fall', desc: '就业形势稳中向好' },
+                    { name: '出口额(月)', value: '2.38万亿', change: '+5.6%', type: 'rise', desc: '外贸韧性持续显现' },
+                    { name: '外汇储备', value: '3.17万亿$', change: '+0.2%', type: 'stable', desc: '汇率保持基本稳定' }
+                ]
+            ],
+            stateChangeCoeff: {
+                normal: { changeRate: 1, status: '平稳恢复，韧性增强', desc: '受贸易战阶段性缓和影响，进出口贸易边际改善，工业生产稳步回升，消费市场持续复苏，主要经济指标均处于合理区间，政策对冲效果逐步显现。' },
+                crisis: { changeRate: 1.5, status: '增速放缓，承压运行', desc: '受美方贸易壁垒升级影响，外需走弱，产业链供应链受扰动，部分行业生产放缓，就业压力有所上升，政策加大逆周期调节力度，对冲外部冲击。' },
+                war: { changeRate: 2.5, status: '大幅波动，面临冲击', desc: '受极端贸易制裁和地缘政治影响，外贸、金融、产业均受显著冲击，核心经济指标出现大幅波动，启动应急政策体系，保障经济基本盘。' }
+            },
+            industries: [
+                { name: '人工智能', impact: 'mid', desc: '核心芯片进口受限，研发进度放缓' },
+                { name: '无人机', impact: 'low', desc: '自主化率高，出口受小幅影响' },
+                { name: '船舶制造', impact: 'low', desc: '国内需求旺盛，海外订单稳定' },
+                { name: '半导体', impact: 'high', desc: '设备和材料进口受限，产能扩张受阻' },
+                { name: '新能源汽车', impact: 'mid', desc: '海外市场壁垒升级，出口成本上升' },
+                { name: '稀土加工', impact: 'low', desc: '掌握核心资源，反制措施掌握主动权' }
+            ],
+            chartData: {
+                xAxis: ['2025Q1', '2025Q2', '2025Q3', '2025Q4', '2026Q1(预测)'],
+                gdp: [4.2, 4.5, 4.8, 5.0, 5.2],
+                export: [3.8, 4.2, 5.6, 6.0, 5.8],
+                employment: [5.5, 5.4, 5.2, 5.1, 5.0]
+            },
+            chartInstance: null
+        };
+
+        // 获取当前轮次的基础经济指标数据
+        function getRoundIndicators(roundIndex) {
+            const list = globalState.baseIndicatorsByRound[roundIndex] || [];
+            return JSON.parse(JSON.stringify(list));
+        }
+
+        // 初始化页面
+        window.onload = function () {
+            initTradeRound();
+            initIndicators();
+            initIndustries();
+            initChart();
+            bindEvents();
+        };
+
+        // 初始化当前轮次的美方措施和中方对策
+        function initTradeRound() {
+            const currentData = globalState.tradeRounds[globalState.currentRound];
+            const usContainer = document.getElementById('us-measure-list');
+            usContainer.innerHTML = `
+                <div class="measure-item">
+                    <div class="measure-date">第${currentData.round}轮 · ${currentData.date}</div>
+                    <div class="measure-content">美方加征措施：${currentData.usMeasure}</div>
+                    <div class="measure-progress">后续进展：${currentData.progress}</div>
+                </div>
+            `;
+            const cnContainer = document.getElementById('cn-countermeasure-list');
+            cnContainer.innerHTML = `
+                <div class="countermeasure-item">
+                    <div class="countermeasure-date">第${currentData.round}轮 · ${currentData.date}</div>
+                    <div class="countermeasure-content">中方反制措施：${currentData.cnCountermeasure}</div>
+                    <div class="countermeasure-progress">后续进展：${currentData.progress}</div>
+                </div>
+            `;
+            document.getElementById('current-time').textContent = currentData.date + ' 贸易战当前阶段';
+        }
+
+        // 初始化经济指标卡片
+        function initIndicators() {
+            const container = document.getElementById('indicator-container');
+            const indicators = getRoundIndicators(globalState.currentRound);
+            container.innerHTML = '';
+            indicators.forEach(ind => {
+                const card = document.createElement('div');
+                card.className = 'indicator-card';
+                card.innerHTML = `
+                    <div class="indicator-name">${ind.name}</div>
+                    <div class="indicator-value">${ind.value}</div>
+                    <div class="indicator-change ${ind.type}">
+                        <span>${ind.change}</span>
+                        <span class="policy-effect">${ind.desc}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 初始化重点产业链
+        function initIndustries() {
+            const container = document.getElementById('industry-list');
+            const industries = globalState.industries;
+            container.innerHTML = '';
+            industries.forEach(ind => {
+                const item = document.createElement('li');
+                item.className = 'industry-item';
+                item.innerHTML = `
+                    <div class="industry-name">${ind.name}</div>
+                    <div class="industry-impact-level">
+                        <span>影响程度：</span>
+                        <div class="impact-bar">
+                            <div class="impact-bar-inner impact-${ind.impact}"></div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 初始化ECharts图表
+        function initChart() {
+            const chartDom = document.getElementById('main-chart');
+            const myChart = echarts.init(chartDom);
+            const data = globalState.chartData;
+            const option = {
+                title: {
+                    text: '核心经济指标走势（含预测）',
+                    textStyle: { color: '#e2e8f0', fontSize: 14 },
+                    left: 'center'
+                },
+                tooltip: { trigger: 'axis' },
+                legend: {
+                    data: ['GDP增速(%)', '出口增速(%)', '城镇调查失业率(%)'],
+                    textStyle: { color: '#94a3b8' },
+                    bottom: 0
+                },
+                grid: { left: '3%', right: '4%', bottom: '15%', top: '15%', containLabel: true },
+                xAxis: {
+                    type: 'category',
+                    data: data.xAxis,
+                    axisLine: { lineStyle: { color: '#334155' } },
+                    axisLabel: { color: '#94a3b8' }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: { lineStyle: { color: '#334155' } },
+                    axisLabel: { color: '#94a3b8' },
+                    splitLine: { lineStyle: { color: '#1e293b' } }
+                },
+                series: [
+                    { name: 'GDP增速(%)', type: 'line', data: data.gdp, color: '#38bdf8', smooth: true },
+                    { name: '出口增速(%)', type: 'line', data: data.export, color: '#10b981', smooth: true },
+                    { name: '城镇调查失业率(%)', type: 'line', data: data.employment, color: '#f59e0b', smooth: true }
+                ]
+            };
+            myChart.setOption(option);
+            window.addEventListener('resize', () => myChart.resize());
+            globalState.chartInstance = myChart;
+        }
+
+        // 绑定所有事件
+        function bindEvents() {
+            // 经济状态切换
+            const stateRadios = document.getElementsByName('economic-state');
+            stateRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    globalState.currentState = this.value;
+                    updatePageByState();
+                });
+            });
+            // 轮次切换
+            const roundSelect = document.getElementById('trade-round');
+            roundSelect.addEventListener('change', function () {
+                globalState.currentRound = parseInt(this.value);
+                initTradeRound();
+                initIndicators();
+                updateChartByState();
+            });
+            // 时间轴上一步
+            document.getElementById('prev-step').addEventListener('click', () => {
+                if (globalState.currentTimeStep > 0) {
+                    globalState.currentTimeStep--;
+                    updateTimeStep();
+                }
+            });
+            // 时间轴下一步
+            document.getElementById('next-step').addEventListener('click', () => {
+                if (globalState.currentTimeStep < globalState.timeSteps.length - 1) {
+                    globalState.currentTimeStep++;
+                    updateTimeStep();
+                }
+            });
+        }
+
+        // 根据经济状态更新页面
+        function updatePageByState() {
+            const state = globalState.currentState;
+            const stateData = globalState.stateChangeCoeff[state];
+            const badges = [
+                document.getElementById('us-state-badge'),
+                document.getElementById('main-state-badge'),
+                document.getElementById('cn-state-badge')
+            ];
+            badges.forEach(badge => {
+                badge.className = `badge badge-${state}`;
+                badge.textContent = state === 'normal' ? '常态' : state === 'crisis' ? '危机态' : '战争态';
+            });
+            document.getElementById('economic-status').textContent = `当前国民经济运行态势：${stateData.status}`;
+            document.getElementById('status-desc').textContent = stateData.desc;
+            updateIndicatorsByState();
+            updateChartByState();
+        }
+
+        // 根据状态更新经济指标
+        function updateIndicatorsByState() {
+            const state = globalState.currentState;
+            const coeff = globalState.stateChangeCoeff[state].changeRate;
+            const container = document.getElementById('indicator-container');
+            const baseIndicators = getRoundIndicators(globalState.currentRound);
+            container.innerHTML = '';
+
+            baseIndicators.forEach(ind => {
+                const changeNum = parseFloat(ind.change.replace(/\+|-/g, ''));
+                const isRise = ind.change.startsWith('+');
+                const newChangeNum = (changeNum * coeff).toFixed(1);
+                const newChange = isRise ? `+${newChangeNum}%` : `-${newChangeNum}%`;
+                ind.change = newChange;
+
+                if (state === 'crisis' || state === 'war') {
+                    if (ind.name === '城镇调查失业率') {
+                        ind.type = 'rise';
+                        ind.value = (5.2 + (coeff - 1) * 0.5).toFixed(1) + '%';
+                    }
+                }
+
+                const card = document.createElement('div');
+                card.className = 'indicator-card';
+                card.innerHTML = `
+                    <div class="indicator-name">${ind.name}</div>
+                    <div class="indicator-value">${ind.value}</div>
+                    <div class="indicator-change ${ind.type}">
+                        <span>${ind.change}</span>
+                        <span class="policy-effect">${ind.desc}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 根据状态更新图表数据
+        function updateChartByState() {
+            const state = globalState.currentState;
+            const chartInstance = globalState.chartInstance;
+            const baseData = JSON.parse(JSON.stringify(globalState.chartData));
+
+            if (state === 'crisis') {
+                baseData.gdp[4] = 4.8;
+                baseData.export[4] = 5.0;
+                baseData.employment[4] = 5.3;
+            } else if (state === 'war') {
+                baseData.gdp[4] = 4.2;
+                baseData.export[4] = 3.5;
+                baseData.employment[4] = 5.8;
+            } else {
+                baseData.gdp[4] = 5.2;
+                baseData.export[4] = 5.8;
+                baseData.employment[4] = 5.0;
+            }
+
+            chartInstance.setOption({
+                series: [
+                    { name: 'GDP增速(%)', data: baseData.gdp },
+                    { name: '出口增速(%)', data: baseData.export },
+                    { name: '城镇调查失业率(%)', data: baseData.employment }
+                ]
+            });
+        }
+
+        // 更新时间轴步骤
+        function updateTimeStep() {
+            const currentStep = globalState.currentTimeStep;
+            document.getElementById('current-time').textContent = globalState.timeSteps[currentStep];
+            updateIndicatorsByTimeStep(currentStep);
+        }
+
+        // 根据时间轴步骤更新指标
+        function updateIndicatorsByTimeStep(step) {
+            const container = document.getElementById('indicator-container');
+            const baseIndicators = getRoundIndicators(globalState.currentRound);
+            container.innerHTML = '';
+
+            baseIndicators.forEach(ind => {
+                const changeNum = parseFloat(ind.change.replace(/\+|-/g, ''));
+                const isRise = ind.change.startsWith('+');
+                const stepAdd = step * 0.1;
+                const newChangeNum = (changeNum + stepAdd).toFixed(1);
+                ind.change = isRise ? `+${newChangeNum}%` : `-${newChangeNum}%`;
+
+                const card = document.createElement('div');
+                card.className = 'indicator-card';
+                card.innerHTML = `
+                    <div class="indicator-name">${ind.name}</div>
+                    <div class="indicator-value">${ind.value}</div>
+                    <div class="indicator-change ${ind.type}">
+                        <span>${ind.change}</span>
+                        <span class="policy-effect">${ind.desc}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+</body>
+
+</html>
