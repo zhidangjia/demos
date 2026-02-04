@@ -49,7 +49,7 @@
     /* 尺寸变量 */
     --container-width: 100vw;
     --container-height: auto;
-    --banner-height: 680px;
+    --banner-height: 360px; 
 
     /* 过渡变量 */
     --transition-fast: 0.3s ease;
@@ -1883,7 +1883,7 @@ body {
 .banner-content {
     position: absolute;
     left: 50%;
-    transform: translateX(-50%) translateY(120px);
+    transform: translateX(-50%) translateY(210px);
     bottom: 60px;
     text-align: center;
     color: #ffffff;
