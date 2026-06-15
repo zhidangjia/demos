@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"近期项目案例 | 朱岸峰","url":"https://mydemos.netlify.app/insight/"}</script>
+    <title>近期项目案例 | 朱岸峰</title>
+    <meta name="nav-current" content="cases|screen">
+    <link rel="stylesheet" href="/styles.css">
+    <style>
+        .insight-list-section {
+            position: relative;
+            width: 100%;
+            margin: 80px 0;
+            padding: 0 90px;
+        }
+
+        .insight-list-container {
+            max-width: var(--content-rail);
+            margin: 0 auto;
+        }
+
+        .insight-list {
+            list-style: none;
+            margin: 30px 0 0 0;
+            padding: 0;
+            display: grid;
+            row-gap: 18px;
+        }
+
+        .insight-list-item a {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 22px 26px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            background: var(--bg-white);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            text-decoration: none;
+            color: inherit;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
+        }
+
+        .insight-list-item a:hover {
+            transform: translateY(-2px);
+            border-color: rgba(94, 73, 210, 0.25);
+            box-shadow: 0 14px 40px rgba(94, 73, 210, 0.12);
+        }
+
+        .insight-list-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+        }
+
+        .insight-list-date {
+            flex: 0 0 auto;
+            font-family: var(--font-secondary);
+            font-size: 18px;
+            color: var(--text-light);
+            letter-spacing: 0.02em;
+        }
+
+        @media (max-width: 768px) {
+            .insight-list-section {
+                padding: 0 16px;
+            }
+
+            .insight-list-item a {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .insight-list-date {
+                font-size: 16px;
+            }
+        }
+    </style>
+    <script src="/script.js" defer></script>
+</head>
+
+<body>
+    <div class="page-container">
+        <!-- 导航菜单 -->
+        <nav class="nav-menu">
+            <a class="nav-item" data-index="0" data-key="home" href="https://zhuanfeng.netlify.app">朱岸峰的网站</a>
+            <a class="nav-item" data-index="1" data-key="cases" href="https://mydemos.netlify.app/">近期作品</a>
+            <a class="nav-item" data-index="2" data-key="blog" href="https://zhuanfeng.netlify.app/blog/">个人博客</a>
+            <a class="nav-item" data-index="3" data-key="genealogy"
+                href="https://zhuanfeng.netlify.app/jingyang-zhu-genealogy/">旌阳朱氏宗谱</a>
+            <a class="nav-item" data-index="5" data-key="sparks" href="https://mysparks.netlify.app/">思维火花</a>
+            <a class="nav-item" data-index="4" data-key="about" href="https://zhuanfeng.netlify.app/aboutme/">关于我</a>
+        </nav>
+        <h1 class="visually-hidden">Insight 文章</h1>
+        <div class="banner-section">
+            <div class="banner-slider">
+                <div class="banner-slide active">
+                    <img src="/images/home/banner1.jpg" alt="Banner 1">
+                    <div class="banner-content">
+                        <h2 class="banner-title">20年+ IT行业从业经验</h2>
+                        <p class="banner-subtitle">难点对接・方案设计・合规交付</p>
+                    </div>
+                    <!-- 标签云 -->
+                    <!-- <div class="tags-container">
+                        <div class="tag-item">品牌设计</div>
+                        <div class="tag-item">UI/UE设计咨询</div>
+                        <div class="tag-item">大屏设计</div>
+                        <div class="tag-item">BS/CS软件设计</div>
+                        <div class="tag-item">APP设计</div>
+                        <div class="tag-item">网站设计</div>
+                        <div class="tag-item">平面设计</div>
+                        <div class="tag-item">LOGO设计</div>
+                    </div> -->
+                </div>
+                <div class="banner-slide">
+                    <img src="/images/home/banner2.jpg" alt="Banner 2">
+                    <div class="banner-content">
+                        <h2 class="banner-title">复杂技术方案设计与落地能力</h2>
+                        <p class="banner-subtitle">擅长处理复杂且模糊的业务场景</p>
+                    </div>
+                </div>
+                <div class="banner-slide">
+                    <img src="/images/home/banner3.jpg" alt="Banner 3">
+                    <div class="banner-content">
+                        <h2 class="banner-title">技术商业融合能力</h2>
+                        <p class="banner-subtitle">北大计算机科班 + VP级管理</p>
+                    </div>
+                </div>
+            </div>
+            <!-- CTA按钮 -->
+            <!-- <div class="cta-buttons">
+                <div class="cta-btn cta-btn-primary">合作咨询</div>
+                <div class="cta-btn cta-btn-secondary">查看案例</div>
+            </div> -->
+        </div>
+
+        <section class="insight-list-section" aria-label="文章列表">
+            <h2 class="industries-title">Insight 文章</h2>
+            <div class="insight-list-container">
+                <ul class="insight-list">
+                    <li class="insight-list-item">
+                        <a href="./next-gen-modern-ai-agent-architecture-2026.html">
+                            <span class="insight-list-title">下一代现代 AI Agent 架构技术栈 (2026 工业落地版)</span>
+                            <time class="insight-list-date" datetime="2026-06-15">2026-06-15</time>
+                        </a>
+                    </li>
+                    <li class="insight-list-item">
+                        <a href="./china-power-equipment-overseas-us-datacenter.html">
+                            <span class="insight-list-title">中国电力设备出海：数据中心需求驱动下的美国市场突破</span>
+                            <time class="insight-list-date" datetime="2026-06-14">2026-06-14</time>
+                        </a>
+                    </li>
+                    <li class="insight-list-item">
+                        <a href="./china-ai-industry-five-core-debates.html">
+                            <span class="insight-list-title">中国AI产业的五大核心争议</span>
+                            <time class="insight-list-date" datetime="2026-06-14">2026-06-14</time>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- <section class="industries-section">
+            <div class="filter-bar">
+                <button class="filter-btn" id="btn-time">全部时间</button>
+                <button class="filter-btn" id="btn-sort">项目排序</button>
+                <button class="filter-btn" id="btn-industry">行业分类</button>
+                <div class="dropdown" id="dropdown-time">
+                    <div class="dropdown-row">
+                        <input type="date" id="start-date">
+                        <span class="dropdown-sep">至</span>
+                        <input type="date" id="end-date">
+                    </div>
+                    <div class="dropdown-actions">
+                        <button class="dropdown-btn" id="time-apply">应用</button>
+                        <button class="dropdown-btn" id="time-clear">清空</button>
+                    </div>
+                </div>
+                <div class="dropdown" id="dropdown-sort">
+                    <div class="dropdown-row">
+                        <button class="sort-time-toggle" id="sort-time-toggle" data-order="asc">按时间排序</button>
+                        <button class="sort-name-toggle" id="sort-name-toggle" data-order="asc">按名称排序</button>
+                    </div>
+                </div>
+                <div class="dropdown" id="dropdown-industry">
+                    <div id="industry-list" class="dropdown-columns"></div>
+                    <div id="subindustry-list" class="dropdown-columns"></div>
+                </div>
+            </div>
+            <div class="industry-grid" id="industry-grid"></div>
+        </section>
+
+
+    </div>
+
+    <script id="industry-data" type="application/json">[
+{"id":"screen-01","name":"某宏观经济态势模拟推演项目","date":"2024-11-01","industry":"军工","subIndustries":[],"image":"/images/cases/某宏观经济态势模拟推演项目.webp","data-link":"/detail/hongguan-jingji.html"},
+{"id":"screen-02","name":"某部委数据引接平台项目","date":"2024-11-01","industry":"军工","subIndustries":[],"image":"/images/cases/某部委数据引接平台项目.webp","data-link":"/detail/shuju-yinjie.html"},
+{"id":"screen-03","name":"某地市智慧城市大脑升级项目","date":"2024-11-01","industry":"军工","subIndustries":[],"image":"/images/cases/某地市智慧城市大脑升级项目.webp","data-link":"/detail/jh-city.html"},
+{"id":"screen-04","name":"某大数据中心态势项目","date":"2024-11-01","industry":"军工","subIndustries":[],"image":"/images/cases/某部委数据引接平台项目.webp","data-link":"/detail/shuju-yinjie.html"}
+]</script>
+    <script>
+    </script> -->
+
+
+</body>
+
+</html>

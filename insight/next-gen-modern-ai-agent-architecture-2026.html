@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="index,follow">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"下一代现代 AI Agent 架构技术栈 (2026 工业落地版)","url":"https://mydemos.netlify.app/insight/next-gen-modern-ai-agent-architecture-2026.html"}</script>
+    <title>下一代现代 AI Agent 架构技术栈 (2026 工业落地版)</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        :root {
+            --font-scale: 1.52;
+        }
+        @page {
+            size: A4;
+            margin: 15mm 12mm;
+            background-color: #f4f6f9;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            color: #1e293b;
+            background-color: #f4f6f9;
+            font-size: calc(10pt * var(--font-scale));
+            line-height: 1.5;
+        }
+        
+        /* Main Container */
+        .container {
+            width: 100%;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 22px 18px;
+        }
+
+        @media print {
+            .container {
+                max-width: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+
+        /* Header Accent Banner Style */
+        .header-banner {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            padding: 24px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 6px solid #3b82f6;
+            position: relative;
+        }
+        .header-banner h1 {
+            margin: 0 0 8px 0;
+            font-size: calc(20pt * var(--font-scale));
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .header-tag {
+            background-color: #3b82f6;
+            color: white;
+            font-size: calc(8pt * var(--font-scale));
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+        .header-banner p {
+            margin: 0;
+            font-size: calc(10pt * var(--font-scale));
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* Grid Layout System using Tables for WeasyPrint */
+        .layout-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 12px 0;
+            margin-bottom: 12px;
+        }
+        .layout-td {
+            vertical-align: top;
+            padding: 0;
+        }
+        .w-50 { width: 50%; }
+        .w-100 { width: 100%; }
+
+        /* Generic Section Block */
+        .section-block {
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .section-title {
+            font-size: calc(11pt * var(--font-scale));
+            font-weight: 700;
+            color: #0f172a;
+            margin-top: 0;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #f1f5f9;
+            display: block;
+        }
+        .section-subtitle {
+            font-size: calc(8.5pt * var(--font-scale));
+            color: #64748b;
+            margin-top: -6px;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+
+        /* Model & Memory Layers */
+        .item-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        .item-list li {
+            padding: 6px 10px;
+            background-color: #f8fafc;
+            border: 1px solid #edf2f7;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: calc(9.5pt * var(--font-scale));
+        }
+        .item-list li strong {
+            color: #334155;
+        }
+        .sub-text {
+            font-size: calc(8pt * var(--font-scale));
+            color: #64748b;
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Tool Categorization Grid */
+        .tool-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px;
+        }
+        .tool-box {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: calc(9pt * var(--font-scale));
+            width: 20%;
+            vertical-align: top;
+        }
+        .tool-box strong {
+            color: #0f172a;
+            display: block;
+            margin-bottom: 4px;
+            font-size: calc(9.5pt * var(--font-scale));
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 2px;
+        }
+
+        /* Runtime Section Specifics */
+        .runtime-container {
+            background-color: #ffffff;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .runtime-title {
+            font-size: calc(12pt * var(--font-scale));
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-top: 0;
+            margin-bottom: 4px;
+        }
+        
+        /* Step Process Flow Chart (using Table structure) */
+        .flow-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px 0;
+            margin: 12px 0;
+        }
+        .flow-step {
+            background-color: #eff6ff;
+            border: 1px dashed #bfdbfe;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            vertical-align: top;
+            width: 25%;
+            position: relative;
+        }
+        .flow-step.active {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+        .flow-step .step-num {
+            background-color: #3b82f6;
+            color: white;
+            font-size: calc(7.5pt * var(--font-scale));
+            font-weight: 700;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .flow-step.active .step-num {
+            background-color: #22c55e;
+        }
+        .flow-title-text {
+            font-weight: 700;
+            font-size: calc(9.5pt * var(--font-scale));
+            color: #1e293b;
+            display: block;
+        }
+        .flow-desc {
+            font-size: calc(8pt * var(--font-scale));
+            color: #64748b;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Orchestration Components */
+        .orch-title {
+            font-size: calc(10pt * var(--font-scale));
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .orch-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px;
+        }
+        .orch-item {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 8px;
+            font-size: calc(9pt * var(--font-scale));
+            text-align: center;
+            font-weight: 600;
+            color: #334155;
+        }
+        /* Highlighted Budget Cap Box */
+        .orch-item.budget-highlight {
+            background-color: #fef2f2;
+            border: 1.5px solid #ef4444;
+            color: #991b1b;
+        }
+        .orch-item.budget-highlight .sub-text {
+            color: #b91c1c;
+            font-weight: normal;
+        }
+
+        /* Cross-cutting Evals & Observability Layer */
+        .observability-container {
+            background-color: #fafafa;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 14px;
+            border-top: 4px solid #6b7280;
+        }
+        .obs-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
+        }
+        .obs-card {
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 10px;
+            width: 33.33%;
+            vertical-align: top;
+        }
+        .obs-card strong {
+            color: #111827;
+            font-size: calc(9.5pt * var(--font-scale));
+            display: block;
+            margin-bottom: 4px;
+        }
+        .obs-card.eval-highlight {
+            border-left: 4px solid #eab308;
+            background-color: #fefce8;
+        }
+
+        /* Footer Info */
+        .footer-note {
+            margin-top: 14px;
+            font-size: calc(8.5pt * var(--font-scale));
+            color: #64748b;
+            text-align: center;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
+        }
+        
+        .badge-evolution {
+            background-color: #fee2e2;
+            color: #991b1b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: calc(7.5pt * var(--font-scale));
+            font-weight: bold;
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .badge-core {
+            background-color: #dcfce7;
+            color: #14532d;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: calc(7.5pt * var(--font-scale));
+            font-weight: bold;
+            margin-left: 6px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Top Banner Header -->
+    <div class="header-banner">
+        <span class="header-tag">Production-grade Agent Architecture</span>
+        <h1>现代 AI Agent 生产级架构图 (2026版)</h1>
+        <p>针对“Token 浪费与逻辑盲目失控”优化。现代智能体已超越早期 2022 单一 ReAct 弱循环，转向以“全局规划、有限重规划”为主导，并依托“硬性预算防线”与“持续评估反退化机制”的闭环工程系统。</p>
+    </div>
+
+    <!-- Layer 1: Model & Memory Layers (Split Column) -->
+    <table class="layout-table">
+        <tr>
+            <td class="layout-td w-50">
+                <div class="section-block">
+                    <span class="section-title">1. 模型基础设施层</span>
+                    <ul class="item-list">
+                        <li>
+                            <strong>基础大语言模型</strong>
+                            <span class="sub-text">OpenAI GPT-5 / Claude 4 Opus / Gemini 3.5 Pro</span>
+                        </li>
+                        <li>
+                            <strong>小模型/领域路由</strong>
+                            <span class="sub-text">Llama-3-8B / Mistral-7B (负责低成本条件路由及意图分类)</span>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+            <td class="layout-td w-50">
+                <div class="section-block">
+                    <span class="section-title">2. 上下文与多模态记忆层</span>
+                    <ul class="item-list">
+                        <li>
+                            <strong>短期工作记忆</strong>
+                            <span class="sub-text">Redis / 会话缓存 (维护有界的 Context Window 缓冲区)</span>
+                        </li>
+                        <li>
+                            <strong>长时语义/事务记忆</strong>
+                            <span class="sub-text">VectorDB (Qdrant/Milvus) + 关系型数据库 (PostgreSQL 混合检索)</span>
+                        </li>
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <!-- Layer 2: Tool Layer -->
+    <div class="section-block">
+        <span class="section-title">3. 受控工具执行层</span>
+        <table class="tool-grid">
+            <tr>
+                <td class="tool-box">
+                    <strong>网络检索与供给</strong>
+                    Tavily / Firecrawl / 实时搜索引擎
+                </td>
+                <td class="tool-box">
+                    <strong>企业级 API 集成</strong>
+                    GitHub / Stripe / Slack 自动化通道
+                </td>
+                <td class="tool-box">
+                    <strong>安全沙箱环境</strong>
+                    E2B / Modal (完全隔离的恶意代码执行岛)
+                </td>
+                <td class="tool-box">
+                    <strong>受控数据存取</strong>
+                    带有行级权限控制的 SQL/NoSQL 数据库
+                </td>
+                <td class="tool-box">
+                    <strong>系统级原子操作</strong>
+                    文件系统、邮件网关、日历调度器
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Layer 3: The Runtime (The Core Evolution) -->
+    <div class="runtime-container">
+        <div class="runtime-title">
+            4. 高级智能体运行时
+            <span class="badge-evolution">2026 核心升级</span>
+        </div>
+        <div class="section-subtitle">从盲目串行的 ReAct 循环，演进为“先规划、后执行、有限度重规划”的高效拓扑</div>
+
+        <!-- Flowchart of Modern Pipeline -->
+        <table class="flow-table">
+            <tr>
+                <td class="flow-step active" style="width: 22%;">
+                    <span class="step-num">A</span>
+                    <span class="flow-title-text">全局规划 (Planner)</span>
+                    <span class="flow-desc">Plan-and-Execute 架构。模型首次推导完整拓扑图/任务树，避免每一步都盲目重新思考。</span>
+                </td>
+                <td class="flow-step" style="width: 26%;">
+                    <span class="step-num">B</span>
+                    <span class="flow-title-text">有界执行循环 (Executor)</span>
+                    <span class="flow-desc">局部高效 ReAct 循环或 LATS (树搜索)。仅在当前原子步骤内调用工具并观察。</span>
+                </td>
+                <td class="flow-step active" style="width: 26%;">
+                    <span class="step-num">C</span>
+                    <span class="flow-title-text">有限度重规划 (Bounded Re-plan)</span>
+                    <span class="flow-desc">当 Observation 遭遇严重非预期阻碍时，才触发“局部剪枝与有界重规划”，大幅降低 Token 级数消耗。</span>
+                </td>
+                <td class="flow-step" style="width: 26%;">
+                    <span class="step-num">D</span>
+                    <span class="flow-title-text">深层自省反射 (Reflexion)</span>
+                    <span class="flow-desc">在最终交付前，启动独立的反思机制，对照全局 Goal 校验产出质量，未达标则回溯。</span>
+                </td>
+            </tr>
+        </table>
+
+        <!-- Orchestration with Critical Additions -->
+        <div class="orch-title">核心运行编排组件</div>
+        <table class="orch-grid">
+            <!-- <tr>
+                <td class="orch-item">任务解耦与拆分<br><span style="font-size: calc(7.5pt * var(--font-scale)); font-weight:normal; color:#64748b;">(Decomposition)</span></td>
+                <td class="orch-item">动态模型/工具路由<br><span style="font-size: calc(7.5pt * var(--font-scale)); font-weight:normal; color:#64748b;">(Dynamic Routing)</span></td>
+                <td class="orch-item">执行流状态机控制<br><span style="font-size: calc(7.5pt * var(--font-scale)); font-weight:normal; color:#64748b;">(State Machine)</span></td>
+                <td class="orch-item budget-highlight">
+                    单次运行硬预算强管控<br>
+                    <span class="sub-text">(Cost Cap & Budget Enforcement)</span>
+                    <span style="font-size: calc(7.5pt * var(--font-scale)); display:block; margin-top:2px; font-weight:bold; color:#ef4444;">※ 超过 $X 或 N 步立即熔断拦截</span>
+                </td>
+                <td class="orch-item">标准错误与重试降级<br><span style="font-size: calc(7.5pt * var(--font-scale)); font-weight:normal; color:#64748b;">(Error Handling)</span></td> -->
+                 <td class="orch-item">任务解耦<br>与拆分</td>
+                <td class="orch-item">动态模型/<br>工具路由</td>
+                <td class="orch-item">执行流<br>状态机控制</td>
+                <td class="orch-item budget-highlight">
+                    单次运行硬预算强管控<br>
+                  
+                    <span style="font-size: calc(7.5pt * var(--font-scale)); display:block; margin-top:2px; font-weight:bold; color:#ef4444;">※ 超过 $X 或 N 步立即熔断拦截</span>
+                </td>
+                <td class="orch-item">标准错误与<br>重试降级</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Layer 4: Cross-cutting Observability, Safety & Continuous Eval -->
+    <div class="observability-container">
+        <div class="runtime-title" style="color: #374151; font-size: calc(11pt * var(--font-scale)); margin-bottom: 8px;">
+            5. 企业级可观测性、防回退评估与安全护栏
+        </div>
+        <table class="obs-grid">
+            <tr>
+                <td class="obs-card eval-highlight">
+                    <strong>持续评估与防回退测试 (Continuous Eval) <span class="badge-core">极其重要</span></strong>
+                    <span class="sub-text" style="color:#713f12;">利用 Langfuse / Prompt Evals 建立 CI/CD 自动化胜率测试。坚决杜绝“修改一行提示词，整体智商悄悄回退”的盲目迭代。</span>
+                </td>
+                <td class="obs-card">
+                    <strong>链路追踪与全生命周期审计 (Tracing)</strong>
+                    <span class="sub-text">LangSmith / Arize Phoenix 深度整合。记录完备的 Session、Runs、Logs 以及微观的 Span 级时延与输入输出。</span>
+                </td>
+                <td class="obs-card">
+                    <strong>动态内容安全与输入输出护栏 (Guardrails)</strong>
+                    <span class="sub-text">Guardrails AI / LlamaGuard / Lakera。动态拦截针对大模型的 Prompt 注入攻击，严格审计并滤除敏感/不合规的工具操作。</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Bottom Note -->
+    <div class="footer-note">
+        架构重构逻辑：拒绝无效的 Thought → Action 循环；引入控制层全局图规划；将硬预算熔断与自动化评估提到核心地位。
+    </div>
+
+</div>
+
+</body>
+</html>

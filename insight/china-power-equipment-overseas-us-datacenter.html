@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="index,follow" />
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中国电力设备出海：数据中心需求驱动下的美国市场突破","url":"https://mydemos.netlify.app/insight/china-power-equipment-overseas-us-datacenter.html"}</script>
+  <title>中国电力设备出海：数据中心需求驱动下的美国市场突破</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #f5f5f5;
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #1a2332;
+      font-size: 16px;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── CARD BASE ── */
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(26,35,50,0.08), 0 1px 3px rgba(26,35,50,0.06);
+      padding: 24px 20px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(26,35,50,0.13), 0 2px 6px rgba(26,35,50,0.08);
+    }
+
+    /* ── GOLD ACCENT ── */
+    .gold { color: #c9a84c; }
+    .gold-line {
+      height: 2px;
+      background: linear-gradient(90deg, #c9a84c 0%, rgba(201,168,76,0.15) 100%);
+      border-radius: 2px;
+      margin: 12px 0;
+    }
+
+    /* ── BADGE ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #c9a84c;
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-header {
+      font-size: 17px;
+      font-weight: 700;
+      color: #1a2332;
+      margin-bottom: 14px;
+      line-height: 1.4;
+    }
+
+    /* ── KEY INSIGHT BLOCK ── */
+    .insight {
+      background: #1a2332;
+      color: #fff;
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 16px;
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+    .insight strong { color: #c9a84c; }
+
+    /* ── TWIN STAT CARDS ── */
+    .twin-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .stat-card {
+      background: #f8f6f1;
+      border: 1.5px solid #e8dfc8;
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .stat-label {
+      font-size: 16px;
+      color: #6b7a8d;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+    .stat-number {
+      font-size: 26px;
+      font-weight: 800;
+      color: #c9a84c;
+      line-height: 1.1;
+      margin-bottom: 5px;
+    }
+    .stat-sub {
+      font-size: 16px;
+      color: #8a95a3;
+    }
+
+    /* ── BULLET LIST ── */
+    .bullet-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #2d3a4a;
+    }
+    .bullet-list li::before {
+      content: "◆";
+      color: #c9a84c;
+      font-size: 16px;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── GOLD BORDERED BOX ── */
+    .gold-box {
+      border: 1.5px solid #c9a84c;
+      border-radius: 10px;
+      padding: 13px 15px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #1a2332;
+      margin-bottom: 16px;
+      background: #fffdf5;
+    }
+    .gold-box strong { color: #c9a84c; }
+
+    /* ── LARGE SINGLE STAT ── */
+    .big-stat {
+      text-align: center;
+      padding: 16px 12px;
+      background: #f8f6f1;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      border: 1.5px solid #e8dfc8;
+    }
+    .big-stat .big-number {
+      font-size: 22px;
+      font-weight: 800;
+      color: #c9a84c;
+      line-height: 1.3;
+    }
+    .big-stat .big-sub {
+      font-size: 16px;
+      color: #6b7a8d;
+      margin-top: 4px;
+    }
+
+    /* ── FLOW STEPS ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin-bottom: 16px;
+    }
+    .flow-step {
+      background: #1a2332;
+      color: #fff;
+      border-radius: 8px;
+      padding: 9px 13px;
+      font-size: 16px;
+      font-weight: 600;
+      text-align: center;
+      white-space: normal;
+    }
+    .flow-arrow {
+      color: #c9a84c;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* ── CLOSING GOLD BOX ── */
+    .closing-box {
+      border-left: 4px solid #c9a84c;
+      background: #fffdf5;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 16px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #1a2332;
+    }
+
+    /* ── TITLE CARD ── */
+    .title-card {
+      background: #1a2332;
+      border-radius: 14px;
+      padding: 30px 24px 24px;
+      box-shadow: 0 4px 20px rgba(26,35,50,0.18);
+      text-align: center;
+    }
+    .title-card .headline {
+      font-size: 20px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.45;
+      margin-bottom: 12px;
+    }
+    .title-card .subtitle {
+      font-size: 16px;
+      color: #c9a84c;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .title-card .gold-line-title {
+      height: 2px;
+      background: linear-gradient(90deg, rgba(201,168,76,0.2) 0%, #c9a84c 50%, rgba(201,168,76,0.2) 100%);
+      border-radius: 2px;
+      margin: 10px auto 14px;
+      width: 80%;
+    }
+    .title-card .small-label {
+      font-size: 16px;
+      color: rgba(255,255,255,0.45);
+      letter-spacing: 0.3px;
+    }
+
+    /* ── SUMMARY CARD ── */
+    .summary-card {
+      background: #1a2332;
+      border-radius: 12px;
+      padding: 26px 20px;
+      box-shadow: 0 4px 16px rgba(26,35,50,0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .summary-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(26,35,50,0.22);
+    }
+    .summary-quote {
+      font-size: 18px;
+      font-weight: 800;
+      color: #c9a84c;
+      text-align: center;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+    .summary-sub {
+      font-size: 16px;
+      color: rgba(255,255,255,0.88);
+      line-height: 1.7;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .summary-small {
+      font-size: 16px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.65;
+      text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 12px;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      text-align: center;
+      font-size: 16px;
+      color: #9aa3ad;
+      padding: 8px 0 4px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 400px) {
+      .twin-stats { grid-template-columns: 1fr 1fr; }
+      .stat-number { font-size: 22px; }
+      .title-card .headline { font-size: 18px; }
+      .flow-step { font-size: 16px; padding: 9px 13px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ══ SECTION 0: TITLE CARD ══ -->
+    <div class="title-card">
+      <div class="headline">中国电力设备出海：数据中心需求驱动下的美国市场突破</div>
+      <div class="subtitle">摩根大通行业调研 · 2026年中期展望</div>
+      <div class="gold-line-title"></div>
+      <div class="small-label">J.P. Morgan — China Power Equipment &amp; Data Center Demand</div>
+    </div>
+
+    <!-- ══ SECTION 1: 美国市场突破 ══ -->
+    <div class="card">
+      <div class="badge">01</div>
+      <div class="section-header">美国市场突破：交付与成本双优势</div>
+      <div class="insight">
+        <strong>核心发现：</strong>中国电力设备供应商获美订单超预期，凭借 <strong>6–12个月交付周期</strong>（西方需2–3年）及价格优势快速渗透
+      </div>
+      <div class="twin-stats">
+        <div class="stat-card">
+          <div class="stat-label">变压器毛利率</div>
+          <div class="stat-number">30–40%</div>
+          <div class="stat-sub">vs 国内仅个位数%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">交付周期</div>
+          <div class="stat-number">6–12<span style="font-size:16px;font-weight:600;">月</span></div>
+          <div class="stat-sub">vs 西方 2–3 年</div>
+        </div>
+      </div>
+      <div class="gold-line"></div>
+      <ul class="bullet-list">
+        <li>企业如伊戈尔、安科瑞等通过本地团队及认证加速布局</li>
+        <li>以数据中心为切入点，获得云服务商认可</li>
+        <li>价格优势叠加交付速度，正在重塑竞争格局</li>
+      </ul>
+    </div>
+
+    <!-- ══ SECTION 2: 技术卡位 ══ -->
+    <div class="card">
+      <div class="badge">02</div>
+      <div class="section-header">技术卡位：固态变压器与预制化先行</div>
+      <div class="insight">
+        <strong>核心趋势：</strong>固态变压器（SST）及高压直流（HVDC）成下一代技术焦点，预制化模块缩短工期成行业新趋势
+      </div>
+      <div class="gold-box">
+        <strong>特锐德「AI PowerHouse」</strong> — 全预制化解决方案，<strong>150天交付</strong>
+      </div>
+      <ul class="bullet-list">
+        <li>伊顿已为AI数据中心推出中压SST，与特锐德合作开发全预制化方案，融合固态变压器与高压预制系统</li>
+        <li>瞄准下一代 220kV 至 800V 直流架构——随AI算力提升，高密度直流架构势在必行</li>
+        <li>业内对SST成本与密度转型存争议，但规模化应用或于2027年后显现</li>
+      </ul>
+    </div>
+
+    <!-- ══ SECTION 3: 需求驱动 ══ -->
+    <div class="card">
+      <div class="badge">03</div>
+      <div class="section-header">需求驱动：2027年迎爆发期</div>
+      <div class="insight">
+        <strong>核心判断：</strong>企业预判2027年美国数据中心需求强劲，项目规划加速，提前锁单现象显现
+      </div>
+      <div class="big-stat">
+        <div class="big-number">国内「2万亿数据中心投资」</div>
+        <div class="big-sub">叠加美国市场机会，双轮驱动增长</div>
+      </div>
+      <div class="gold-line"></div>
+      <ul class="bullet-list">
+        <li>当前大规模采购尚未启动，但云服务商项目规划已明显提速</li>
+        <li>竞争策略：以性价比切入成本敏感项目，逐步突破高端市场</li>
+        <li>差异化技术突围：构网型储能、混合储能系统等提升竞争力</li>
+      </ul>
+    </div>
+
+    <!-- ══ SECTION 4: 升维逻辑 ══ -->
+    <div class="card">
+      <div class="badge">04</div>
+      <div class="section-header">升维逻辑：从制造到技术定义</div>
+      <div class="insight">
+        <strong>核心路径：</strong>中国厂商以交付与成本优势抢占市场，同步技术布局卡位未来，借预制化满足效率需求，形成「制造—技术—生态」协同路径
+      </div>
+      <div class="flow">
+        <div class="flow-step">制造优势</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">技术卡位</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">预制化效率</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">生态主导</div>
+      </div>
+      <div class="closing-box">
+        当SST规模化落地、预制化成熟，中国厂商有望<strong style="color:#c9a84c;">主导全球数据中心电力设备格局</strong>，实现从代工者到技术定义者的升维。
+      </div>
+    </div>
+
+    <!-- ══ SECTION 5: 总结与展望 ══ -->
+    <div class="summary-card">
+      <div class="summary-quote">交付速度 + 成本优势 → 市场突破 → 技术升维</div>
+      <div class="summary-sub">
+        中国电力设备行业正从「成本驱动出口」转向「技术定义出海」，数据中心是决定性战场。
+      </div>
+      <div class="summary-small">
+        摩根大通认为，在AI算力基础设施的全球竞赛中，中国电力设备供应商的竞争力正被系统性低估。
+      </div>
+    </div>
+
+    <!-- ══ FOOTER ══ -->
+    <div class="footer">
+      📊 资料来源：J.P. Morgan 行业调研报告 · 内容仅供参考，不构成投资建议
+    </div>
+
+  </div>
+</body>
+</html>
