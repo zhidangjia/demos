@@ -297,10 +297,48 @@
       .title-card .headline { font-size: 18px; }
       .flow-step { font-size: 16px; padding: 9px 13px; }
     }
+
+    .skip-link {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      transform: translateY(-200%);
+      transition: transform 0.2s ease;
+      z-index: 10000;
+    }
+
+    .skip-link:focus {
+      transform: translateY(0);
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid #111827;
+      outline-offset: 3px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html:focus-within { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
+  <a class="skip-link" href="#main-content">跳到主要内容</a>
+  <main id="main-content" class="container">
 
     <!-- ══ SECTION 0: TITLE CARD ══ -->
     <div class="title-card">
@@ -410,6 +448,6 @@
       📊 资料来源：J.P. Morgan 行业调研报告 · 内容仅供参考，不构成投资建议
     </div>
 
-  </div>
+  </main>
 </body>
 </html>

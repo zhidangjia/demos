@@ -64,34 +64,78 @@
             margin-top: 16px;
             color: #777;
         }
+
+        .skip-link {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            transform: translateY(-200%);
+            transition: transform 0.2s ease;
+            z-index: 10000;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #000;
+            outline-offset: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html:focus-within {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <h1>提取字幕内容</h1>
-    <div class="section">
-        <input id="file" type="file" accept=".srt,.md,.txt">
-        <button id="parseFile">解析文件</button>
-    </div>
-    <div class="section">
-        <textarea id="text" placeholder="或将字幕内容粘贴到此处"></textarea>
-        <button id="parseText">解析文本</button>
-        <button id="clear">清空</button>
-        <span id="count"></span>
-        <label for="chunk" style="margin-left:12px;">分段行数</label>
-        <select id="chunk">
-            <option value="10">10</option>
-            <option value="30" selected>30</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-        </select>
-    </div>
-    <div id="result" class="section">
-        <ol id="list"></ol>
-    </div>
-    <div class="section">
-        <button id="copyAll">复制全部</button>
-    </div>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <main id="main-content">
+        <h1>提取字幕内容</h1>
+        <div class="section">
+            <label for="file">选择字幕文件</label>
+            <input id="file" type="file" accept=".srt,.md,.txt">
+            <button id="parseFile">解析文件</button>
+        </div>
+        <div class="section">
+            <label for="text">字幕内容</label>
+            <textarea id="text" placeholder="或将字幕内容粘贴到此处"></textarea>
+            <button id="parseText">解析文本</button>
+            <button id="clear">清空</button>
+            <span id="count" aria-live="polite"></span>
+            <label for="chunk" style="margin-left:12px;">分段行数</label>
+            <select id="chunk">
+                <option value="10">10</option>
+                <option value="30" selected>30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div id="result" class="section">
+            <ol id="list"></ol>
+        </div>
+        <div class="section">
+            <button id="copyAll">复制全部</button>
+        </div>
+    </main>
     <script>
         function isIndex(line) { return /^\d+$/.test(line.trim()); }
         function isTimestamp(line) {

@@ -540,13 +540,58 @@
                 height: 300px;
             }
         }
+
+        .skip-link {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #0f172a;
+            text-decoration: none;
+            transform: translateY(-200%);
+            transition: transform 0.2s ease;
+            z-index: 10000;
+        }
+
+        .skip-link:focus {
+            transform: translateY(0);
+        }
+
+        a:focus-visible,
+        button:focus-visible,
+        input:focus-visible,
+        select:focus-visible,
+        textarea:focus-visible {
+            outline: 3px solid #38bdf8;
+            outline-offset: 3px;
+        }
+
+        .round-select:focus-visible {
+            outline: 3px solid #38bdf8;
+            outline-offset: 3px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html:focus-within {
+                scroll-behavior: auto;
+            }
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <main id="main-content" class="container">
         <!-- 头部 -->
-        <div class="header">
+        <header class="header">
             <h1>贸易战宏观经济推演系统</h1>
             <div class="state-switch">
                 <label><input type="radio" name="economic-state" value="normal" checked> 常态 <span
@@ -574,7 +619,7 @@
                 <span id="current-time">2025年10月30日 贸易战当前阶段</span>
                 <button id="next-step">下一步</button>
             </div>
-        </div>
+        </header>
 
         <!-- 左侧：美方措施面板 - 新增【纳斯达克大盘云图】 -->
         <div class="panel us-panel">
@@ -646,10 +691,10 @@
         </div>
 
         <!-- 底部 -->
-        <div class="footer">
+        <footer class="footer">
             贸易战宏观经济推演系统 © 2026 | 2025年8轮对战数据模拟推演 | 纳斯达克/A股云图为图片占位，预留实时接口 | 涵盖20+贸易国家/9+经济模型要素/5+外生冲击量化指标
-        </div>
-    </div>
+        </footer>
+    </main>
 
     <script>
         // 全局状态（无修改，保留原有所有数据）

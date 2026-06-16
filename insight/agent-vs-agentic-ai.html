@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 智能体 vs 能动式 AI — 信息图</title>
+<style>
+  :root{
+    --page:#eef0fb;
+    --navy:#1a1f6e;
+    --ink:#23264f;
+    --card:#ffffff;
+    --card-border:#d9dcf2;
+
+    --blue:#5b6ee8;
+    --purple:#8b6ed8;
+    --green:#3aa856;
+    --red:#e85b6e;
+    --pink:#f3aac4;
+
+    --fill-lav:#e7e4f7;
+    --fill-blue:#dfe4fb;
+    --fill-green:#dff0e3;
+    --fill-red:#fbe2e6;
+    --fill-pink:#fbeaf1;
+
+    --muted:#5d6080;
+    --arrow:#3a3f7a;
+
+    --font-display:'Poppins','Montserrat','Microsoft YaHei','微软雅黑',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+    --font-body:'Microsoft YaHei','微软雅黑',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+  body{
+    background:var(--page);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.42;
+    padding:28px 18px 40px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .poster{
+    width:800px;
+    max-width:100%;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    font-family:var(--font-display);
+    font-weight:800;
+    letter-spacing:-.02em;
+    line-height:.95;
+    margin-bottom:18px;
+    flex-wrap:wrap;
+  }
+  .masthead .plain{ color:var(--navy); font-size:54px; }
+  .masthead .vs{ color:var(--navy); font-size:54px; font-weight:700; }
+  .masthead .block{
+    color:#fff; background:var(--navy);
+    font-size:54px; padding:6px 16px 10px;
+    border-radius:4px;
+  }
+
+  /* ---------- columns ---------- */
+  .cols{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+  .col{ display:flex; flex-direction:column; gap:16px; }
+
+  /* ---------- section heading (pill over a panel) ---------- */
+  .section{ position:relative; }
+  .sec-title{
+    display:inline-block;
+    background:var(--card);
+    border:1.5px solid var(--card-border);
+    border-radius:10px;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:19px;
+    color:var(--navy);
+    padding:6px 16px;
+    position:relative;
+    z-index:2;
+    margin:0 auto;
+  }
+  .sec-title-wrap{ text-align:center; margin-bottom:-14px; position:relative; z-index:2; }
+  .panel{
+    background:var(--card);
+    border:1.5px solid var(--card-border);
+    border-radius:14px;
+    padding:26px 18px 18px;
+  }
+
+  /* ---------- tag chips ---------- */
+  .tag{
+    display:inline-block;
+    color:#fff;
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:.02em;
+    padding:5px 12px;
+    border-radius:7px;
+  }
+  .tag.blue{background:var(--blue);}
+  .tag.purple{background:var(--purple);}
+  .tag.green{background:var(--green);}
+  .tag.red{background:var(--red);}
+  .tag.pink{background:var(--pink);color:#7a2f48;}
+
+  p.def{ font-size:13.5px; color:var(--ink); margin:6px 0 14px; }
+  p.def:last-child{ margin-bottom:0; }
+  .def b{ color:var(--navy); }
+  .meanblock > .def{ padding:10px 12px; border-radius:10px; }
+  .meanblock > .tag.blue + .def{ background:var(--fill-blue); }
+  .meanblock > .tag.purple + .def{ background:var(--fill-lav); }
+  .meanblock > .tag.green + .def{ background:var(--fill-green); }
+  .meanblock > .tag.red + .def{ background:var(--fill-red); }
+  .meanblock > .tag.pink + .def{ background:var(--fill-pink); }
+
+  /* ---------- levels / labeled rows with arrow ---------- */
+  .row{ display:flex; align-items:center; gap:0; margin:9px 0; }
+  .row .lab{
+    color:#fff; font-family:var(--font-display); font-weight:700;
+    font-size:14px; letter-spacing:.03em;
+    padding:5px 10px; border-radius:6px; white-space:nowrap;
+  }
+  .row .arrow{ color:var(--arrow); font-size:16px; padding:0 9px; flex:0 0 auto; }
+  .row .txt{ font-size:13px; color:var(--ink); }
+  .lab.blue{background:var(--blue);}
+  .lab.purple{background:var(--purple);}
+  .lab.green{background:var(--green);}
+  .lab.red{background:var(--red);}
+  .lab.pink{background:var(--pink);color:#7a2f48;}
+
+  .lab-r{ /* right-aligned label column (How They Work Inside) */
+    color:#fff;font-family:var(--font-display);font-weight:700;
+    font-size:14px;padding:5px 11px;border-radius:6px;white-space:nowrap;text-align:center;
+  }
+  .lab-r.blue{background:var(--blue);}
+  .lab-r.purple{background:var(--purple);}
+  .lab-r.green{background:var(--green);}
+  .lab-r.red{background:var(--red);}
+  .lab-r.pink{background:var(--pink);color:#7a2f48;}
+
+  .txt.hl{
+    display:inline-block;
+    background:var(--fill-green);
+    padding:2px 8px;
+    border-radius:6px;
+  }
+
+  /* ---------- bullet sub-cards ---------- */
+  .subcard{
+    border-radius:10px; padding:11px 14px; font-size:12.5px;
+  }
+  .subcard.lav{ background:var(--fill-lav); }
+  .subcard.blue{ background:var(--fill-blue); }
+  .subcard ul{ list-style:none; }
+  .subcard li{ position:relative; padding-left:14px; margin:3px 0; }
+  .subcard li::before{ content:"•"; position:absolute; left:0; color:var(--navy); }
+
+  .stack{ display:flex; flex-direction:column; gap:10px; }
+  .two{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  /* ---------- mean blocks ---------- */
+  .meanblock{ margin-bottom:6px; }
+
+  /* ---------- examples ---------- */
+  .exrow{ display:flex; align-items:flex-start; gap:12px; border-radius:10px; padding:11px 14px; margin:8px 0; }
+  .exrow.red{ background:var(--fill-red); }
+  .exrow.pink{ background:var(--fill-pink); }
+  .exrow .ex-lab{ flex:0 0 90px; }
+  .exrow .ex-txt{ font-size:12.5px; }
+
+  /* ---------- which one to use ---------- */
+  .whichrow{ display:flex; align-items:center; gap:0; margin:11px 0; }
+  .whichrow .q{
+    color:#fff;font-family:var(--font-display);font-weight:700;font-size:14px;
+    padding:7px 13px;border-radius:7px;white-space:nowrap;
+  }
+  .whichrow .arrow{ color:var(--arrow); font-size:18px; padding:0 11px; }
+  .whichrow .a{ font-size:13px; }
+  .q.red{background:var(--red);}
+  .q.pink{background:var(--pink);color:#7a2f48;}
+
+  /* ---------- measure success ---------- */
+  .measrow{ display:flex; align-items:flex-start; gap:12px; margin:9px 0; }
+  .measrow .m-lab{ flex:0 0 auto; }
+  .measrow .m-txt{ font-size:12.5px; padding-top:3px; }
+
+  /* ---------- flow diagram ---------- */
+  .flow{ margin-top:16px; display:grid; grid-template-columns:auto 1fr; gap:22px; align-items:start; }
+  .flow .node{
+    background:var(--green); color:#fff; font-family:var(--font-display); font-weight:700;
+    font-size:13.5px; text-align:center; padding:9px 0; border-radius:8px;
+  }
+  .flow .chain{ display:flex; flex-direction:column; gap:0; align-items:center; }
+  .flow .chain .node{ width:92px; }
+  .flow .down{ color:var(--ink); font-size:15px; line-height:1; margin:3px 0; }
+
+  .flow-r{ position:relative; }
+  .flow-r .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:40px 30px; }
+  .flow-r .node{ width:100%; }
+
+  /* ---------- footer ---------- */
+  .footer{
+    margin-top:18px; background:var(--card); border:1.5px solid var(--card-border);
+    border-radius:14px; padding:13px 18px; text-align:center;
+    font-family:var(--font-display); font-weight:600; color:var(--navy); font-size:15px;
+    display:flex; align-items:center; justify-content:center; gap:9px; flex-wrap:wrap;
+  }
+  .footer .av{ display:inline-flex; }
+  .footer .av span{ width:24px;height:24px;border-radius:50%;display:inline-block;border:2px solid #fff; }
+  .footer .av span:nth-child(1){ background:#e8a0b4; margin-right:-8px; }
+  .footer .av span:nth-child(2){ background:#9b8ed8; }
+  .footer .hl{ color:var(--blue); }
+  .footer a{ color:var(--blue); text-decoration:none; border-bottom:1px solid rgba(91,110,232,.45); }
+  .footer a:hover{ border-bottom-color:rgba(91,110,232,.95); }
+
+  /* ---------- micro-interactions ---------- */
+  .row,.exrow,.whichrow,.measrow,.subcard,.meanblock,.flow .node{ transition:transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+  .row:hover,.whichrow:hover,.measrow:hover{ transform:translateX(3px); }
+  .exrow:hover,.subcard:hover{ transform:translateY(-2px); box-shadow:0 6px 16px rgba(26,31,110,.10); }
+  .tag:hover,.lab:hover,.lab-r:hover,.q:hover{ filter:brightness(1.07); }
+  .flow .node:hover{ transform:scale(1.04); box-shadow:0 5px 14px rgba(58,168,86,.30); }
+  .panel:hover{ box-shadow:0 8px 24px rgba(26,31,110,.07); }
+  .panel{ transition:box-shadow .2s ease; }
+
+  /* ---------- responsive ---------- */
+  @media (max-width:720px){
+    .cols{ grid-template-columns:1fr; }
+    .masthead .plain,.masthead .vs,.masthead .block{ font-size:40px; }
+  }
+
+  /* ---------- print ---------- */
+  @media print{
+    @page{ size:800px 1010px; margin:0; }
+    body{ background:#fff; padding:14px; }
+    .poster{ width:772px; }
+    .panel,.footer{ box-shadow:none !important; }
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+  <div class="poster">
+
+    <!-- masthead -->
+    <div class="masthead" data-od-id="masthead">
+      <span class="plain">AI Agents</span>
+      <span class="vs">vs</span>
+      <span class="block">Agentic AI</span>
+    </div>
+
+    <div class="cols">
+
+      <!-- ================= LEFT COLUMN ================= -->
+      <div class="col">
+
+        <!-- What They Mean -->
+        <section class="section" data-od-id="what-they-mean">
+          <div class="sec-title-wrap"><span class="sec-title">概念定义</span></div>
+          <div class="panel">
+            <div class="meanblock">
+              <span class="tag blue">AI AGENT</span>
+              <p class="def">受领任务后，执行某一特定任务<br>
+              <b>示例：</b> “总结这份 PDF” → 完成<br>
+              <b>决策方式：</b> 仅在收到指令时行动</p>
+            </div>
+            <div class="meanblock">
+              <span class="tag blue">AGENTIC AI SYSTEM</span>
+              <p class="def">自主进行规划、执行并持续优化任务<br>
+              <b>决策方式：</b> 根据设定的最终目标，自主选择后续步骤</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Levels of Smartness -->
+        <section class="section" data-od-id="levels">
+          <div class="sec-title-wrap"><span class="sec-title">智能等级</span></div>
+          <div class="panel">
+            <div class="row"><span class="lab purple">L0级</span><span class="arrow">➜</span><span class="txt">执行单条命令</span></div>
+            <div class="row"><span class="lab purple">L1级</span><span class="arrow">➜</span><span class="txt">按步骤辅助</span></div>
+            <div class="row"><span class="lab purple">L2级</span><span class="arrow">➜</span><span class="txt">可独立完成小任务</span></div>
+            <div class="row"><span class="lab purple">L3级</span><span class="arrow">➜</span><span class="txt">多个智能体协作</span></div>
+            <div class="row"><span class="lab purple">L4级</span><span class="arrow">➜</span><span class="txt">利用记忆进行自我纠错</span></div>
+            <div class="row"><span class="lab purple">L5级</span><span class="arrow">➜</span><span class="txt">完全自主并持续自我改进</span></div>
+          </div>
+        </section>
+
+        <!-- What Tools They Use -->
+        <section class="section" data-od-id="tools">
+          <div class="sec-title-wrap"><span class="sec-title">常用工具与框架</span></div>
+          <div class="panel">
+            <div class="meanblock">
+              <span class="tag blue">L0 – L2级</span>
+              <p class="def">LangChain, OpenAI Assistants, Zapier, n8n</p>
+            </div>
+            <div class="meanblock">
+              <span class="tag blue">L2 – L5级</span>
+              <p class="def">CrewAI, LangGraph, AutoGen, MetaGPT</p>
+            </div>
+            <div class="meanblock">
+              <span class="tag blue">记忆与环境</span>
+              <div class="subcard blue" style="margin-top:8px;">
+                <ul>
+                  <li>短期记忆：SQLite</li>
+                  <li>长期记忆：Pinecone、Weaviate、Chroma</li>
+                  <li>API、浏览器、云端工具</li>
+                  <li>通过反馈实现学习与改进</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- When to Use What -->
+        <section class="section" data-od-id="when-to-use">
+          <div class="sec-title-wrap"><span class="sec-title">适用场景</span></div>
+          <div class="panel">
+            <div class="meanblock">
+              <span class="tag purple">适合用简单Agent：</span>
+              <p class="def">一次性、快速任务<br><b>示例：</b> 总结一份报告</p>
+            </div>
+            <div class="meanblock">
+              <span class="tag purple">适合用Agentic System：</span>
+              <p class="def">复杂且持续演进的工作<br><b>示例：</b> 调研 + 报告 + 演示文稿</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Examples in Action -->
+        <section class="section" data-od-id="examples">
+          <div class="sec-title-wrap"><span class="sec-title">应用示例</span></div>
+          <div class="panel">
+            <div class="exrow red">
+              <span class="ex-lab"><span class="tag red">AI Agent</span></span>
+              <span class="ex-txt">邮件撰写、文档摘要、简单聊天机器人</span>
+            </div>
+            <div class="exrow pink">
+              <span class="ex-lab"><span class="tag pink">Agentic System</span></span>
+              <span class="ex-txt">调研助手、数据分析助手、产品设计助手、可自主运行的代码审查器</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ================= RIGHT COLUMN ================= -->
+      <div class="col">
+
+        <!-- How They Work Inside -->
+        <section class="section" data-od-id="how-work">
+          <div class="sec-title-wrap"><span class="sec-title">内部工作机制</span></div>
+          <div class="panel">
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">ReAct</span><span class="arrow">➜</span><span class="txt hl">思考→行动→检查→重复</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">规划与执行</span><span class="arrow">➜</span><span class="txt hl">规划器 + 执行器</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">层级架构</span><span class="arrow">➜</span><span class="txt hl">管理者分配任务</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">团队协作</span><span class="arrow">➜</span><span class="txt hl">角色协同</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">作者-评论家模式</span><span class="arrow">➜</span><span class="txt hl">内容生成 + 审核修正</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">反思循环</span><span class="arrow">➜</span><span class="txt hl">自检与纠错</span></div>
+            <div class="row"><span class="lab-r green" style="flex:0 0 140px;">认知层</span><span class="arrow">➜</span><span class="txt hl">多系统融合架构</span></div>
+          </div>
+        </section>
+
+        <!-- How to Build One -->
+        <section class="section" data-od-id="how-build">
+          <div class="sec-title-wrap"><span class="sec-title">如何搭建</span></div>
+          <div class="panel">
+            <div class="meanblock" style="margin-bottom:12px;">
+              <span class="tag purple">单个Agent</span>
+              <div class="subcard lav" style="margin-top:8px;">
+                <ul>
+                  <li>选择一个清晰任务</li>
+                  <li>选择工具</li>
+                  <li>定义输入/输出</li>
+                  <li>添加辅助能力（数据库、检索）</li>
+                  <li>测试并迭代优化</li>
+                </ul>
+              </div>
+            </div>
+            <div class="meanblock">
+              <span class="tag purple">Agentic System</span>
+              <div class="two" style="margin-top:8px;">
+                <div class="subcard lav">
+                  <ul>
+                    <li>定义全局目标</li>
+                    <li>选择框架</li>
+                    <li>分配角色</li>
+                    <li>设定通信流/编排逻辑</li>
+                  </ul>
+                </div>
+                <div class="subcard lav">
+                  <ul>
+                    <li>集成记忆模块</li>
+                    <li>配置规则与边界/护栏</li>
+                    <li>打通工具链</li>
+                    <li>保留人工把关</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Which One to Use -->
+        <section class="section" data-od-id="which-one">
+          <div class="sec-title-wrap"><span class="sec-title">如何选择</span></div>
+          <div class="panel">
+            <div class="whichrow"><span class="q red">快速任务？</span><span class="arrow">➜</span><span class="a">用简单Agent</span></div>
+            <div class="whichrow"><span class="q red">多步骤任务？</span><span class="arrow">➜</span><span class="a">用规划器 + 执行器</span></div>
+            <div class="whichrow"><span class="q red">持续/创造性工作？</span><span class="arrow">➜</span><span class="a">用Agentic System</span></div>
+          </div>
+        </section>
+
+        <!-- How to Measure Success -->
+        <section class="section" data-od-id="measure">
+          <div class="sec-title-wrap"><span class="sec-title">如何衡量效果</span></div>
+          <div class="panel">
+            <div class="measrow">
+              <span class="m-lab"><span class="tag green">面向Agent</span></span>
+              <span class="m-txt">快速、低成本、准确</span>
+            </div>
+            <div class="measrow">
+              <span class="m-lab"><span class="tag green">面向Agentic System</span></span>
+              <span class="m-txt">能处理复杂性、会学习、降低人工监督</span>
+            </div>
+
+            <!-- flow diagram -->
+            <div class="flow">
+              <div class="chain">
+                <div class="node">用户</div>
+                <div class="down">↓</div>
+                <div class="node">Agent</div>
+                <div class="down">↓</div>
+                <div class="node">任务</div>
+                <div class="down">↓</div>
+                <div class="node">输出</div>
+              </div>
+              <div class="flow-r">
+                <svg viewBox="0 0 340 250" width="100%" style="display:block;overflow:visible;" aria-label="包含记忆与环境反馈回路的：目标、规划器、执行器">
+                  <defs>
+                    <marker id="ah" markerWidth="9" markerHeight="9" refX="6.5" refY="3" orient="auto">
+                      <path d="M0,0 L6.5,3 L0,6 Z" fill="#23264f"/>
+                    </marker>
+                  </defs>
+
+                  <!-- connectors (drawn first, behind boxes) -->
+                  <g fill="none" stroke="#23264f" stroke-width="2" marker-end="url(#ah)">
+                    <!-- Goal -> Planner -->
+                    <path d="M200,46 L200,74"/>
+                    <!-- Planner -> Executor -->
+                    <path d="M200,114 L200,142"/>
+                    <!-- Executor -> Memory -->
+                    <path d="M155,170 L90,170 L90,200"/>
+                    <!-- Executor -> Environment -->
+                    <path d="M230,170 300,170 L300,200"/>
+                    <!-- Memory -> Goal (feedback up the left side) -->
+                    <path d="M70,196 L70,28 L150,28"/>
+                  </g>
+                  <!-- Environment -> Goal (dotted feedback up the right side) -->
+                  <g fill="none" stroke="#23264f" stroke-width="2" stroke-dasharray="3 4" marker-end="url(#ah)">
+                    <path d="M320,200 L320,28 L252,28"/>
+                  </g>
+
+                  <!-- nodes -->
+                  <g font-family="Poppins, Montserrat, system-ui, sans-serif" font-weight="700" font-size="14" fill="#fff" text-anchor="middle">
+                    <g><rect x="150" y="14" width="100" height="32" rx="8" fill="#3aa856"/><text x="200" y="35">目标</text></g>
+                    <g><rect x="150" y="82" width="100" height="32" rx="8" fill="#3aa856"/><text x="200" y="103">规划器</text></g>
+                    <g><rect x="150" y="150" width="100" height="32" rx="8" fill="#3aa856"/><text x="200" y="171">执行器</text></g>
+                    <g><rect x="30" y="200" width="100" height="32" rx="8" fill="#3aa856"/><text x="80" y="221">记忆</text></g>
+                    <g><rect x="232" y="200" width="116" height="32" rx="8" fill="#3aa856"/><text x="290" y="221">环境</text></g>
+                  </g>
+                </svg>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- footer -->
+    <div class="footer" data-od-id="footer">
+      <span>获取更多关于 <span class="hl">科技</span> 的洞察：</span>
+      <a href="https://zhuanfeng.netlify.app" target="_blank" rel="noopener">zhuanfeng.netlify.app</a>
+    </div>
+
+  </div>
+</body>
+</html>
